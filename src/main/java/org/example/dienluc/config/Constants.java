@@ -15,7 +15,7 @@ public final class Constants {
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     // Regex for citizen identification number (CCCD)
-    public static final String CCCD_REGEX = "^[0-9]{11}$";
+    public static final String CCCD_REGEX = "^(0)([0-9]{11})$";
 
     public static final String SYSTEM = "system";
     public static final String DEFAULT_LANGUAGE = "vi";

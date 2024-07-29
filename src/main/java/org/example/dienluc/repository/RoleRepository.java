@@ -1,10 +1,10 @@
 package org.example.dienluc.repository;
 
-import org.example.dienluc.entity.Employee;
+import org.example.dienluc.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+public interface RoleRepository extends JpaRepository<Role, Integer> {
 
 }

@@ -1,9 +1,10 @@
 package org.example.dienluc.service.serviceImpl;
 
-import org.example.dienluc.domain.Employee;
+import org.example.dienluc.entity.Employee;
 import org.example.dienluc.repository.EmployeeRepository;
 import org.example.dienluc.service.EmployeeService;
-import org.example.dienluc.service.dto.EmployeeDto;
+import org.example.dienluc.service.dto.employee.EmployeeChooseDto;
+import org.example.dienluc.service.dto.employee.EmployeeDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,5 +31,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee addEmployee(EmployeeDto employeeDto) {
         return employeeRepository.save(modelMapper.map(employeeDto, Employee.class));
+    }
+
+    @Override
+    public List<EmployeeChooseDto> getRecordableEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(employee -> {
+                    EmployeeChooseDto employeeChooseDto = modelMapper.map(employee, EmployeeChooseDto.class);
+                    employeeChooseDto.setIdAndFullName(employee.getIdAndFullName());
+                    return employeeChooseDto;
+                })
+                .collect(Collectors.toList());
     }
 }
