@@ -22,6 +22,7 @@ public class WebConfig {
 
             }
         };
+
         modelMapper.addMappings(billMap);
         return modelMapper;
     }

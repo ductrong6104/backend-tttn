@@ -4,6 +4,7 @@ import org.example.dienluc.entity.Contract;
 import org.example.dienluc.service.dto.ResponseCheck;
 import org.example.dienluc.service.dto.contract.ContractCreateDto;
 import org.example.dienluc.service.dto.contract.ContractGetDto;
+import org.example.dienluc.service.dto.contract.ContractStatusGetDto;
 import org.example.dienluc.service.dto.contract.RegistrationFormDto;
 
 import java.util.List;
@@ -21,4 +22,11 @@ public interface ContractService {
     public List<ContractGetDto> getAllContract();
 
     public Contract terminateContract(Integer contractId);
+
+
+    public ContractStatusGetDto getContractStatusByClientId(Integer clientId);
+
+    public Contract rejectContract(Integer contractId, Integer employeeId);
+
+    public String cancelRegisterByClientId(Integer clientId);
 }

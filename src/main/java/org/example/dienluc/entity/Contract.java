@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.dienluc.ContractStatus;
 import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
@@ -40,4 +41,15 @@ public class Contract {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "IDNHANVIENXULY")
     private Employee processingEmployee;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "IDTRANGTHAI")
+    private ContractStatus contractStatus;
+    @PrePersist
+    protected void onCreate() {
+        if (contractStatus == null){
+            contractStatus = ContractStatus.builder()
+                    .id(1)
+                    .build();
+        }
+    }
 }

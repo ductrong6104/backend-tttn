@@ -59,5 +59,24 @@ public class AccountController {
         return ResponseEntity.ok(accountService.login(accountSiginDto));
     }
 
+    @GetMapping("/employees")
+    public ResponseEntity<?> getAccountOfEmployees() {
+        ResponseData responseData = ResponseData.builder()
+                .data(accountService.getAccountOfEmployees())
+                .message("create account of employees")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @DeleteMapping("/{username}")
+    public ResponseEntity<?> deleteAccount(@PathVariable String username) {
+        ResponseData responseData = ResponseData.builder()
+                .data(accountService.deleteAccount(username))
+                .message("delete account")
+                .status(HttpStatus.NO_CONTENT.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
 
 }

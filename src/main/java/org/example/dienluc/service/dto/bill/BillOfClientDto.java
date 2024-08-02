@@ -16,6 +16,5 @@ public class BillOfClientDto {
     private String invoiceDate;
     private String paymentDueDate;
     private BigDecimal totalAmount;
-    private String paymentDate;
-    private Boolean status;
+    private Boolean paymentStatus;
 }

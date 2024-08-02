@@ -1,6 +1,7 @@
 package org.example.dienluc.service.serviceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.dienluc.ContractStatus;
 import org.example.dienluc.controller.ContractController;
 import org.example.dienluc.entity.Client;
 import org.example.dienluc.entity.Contract;
@@ -14,11 +15,13 @@ import org.example.dienluc.service.ContractService;
 import org.example.dienluc.service.dto.ResponseCheck;
 import org.example.dienluc.service.dto.contract.ContractCreateDto;
 import org.example.dienluc.service.dto.contract.ContractGetDto;
+import org.example.dienluc.service.dto.contract.ContractStatusGetDto;
 import org.example.dienluc.service.dto.contract.RegistrationFormDto;
 import org.example.dienluc.util.DateUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -43,7 +46,7 @@ public class ContractServiceImpl implements ContractService {
         this.modelMapper = modelMapper;
         this.employeeRepository = employeeRepository;
     }
-
+    @Transactional
     @Override
     public Contract createContract(ContractCreateDto contractCreateDto) {
         String currentDate = DateUtil.formatDateForDatabase(LocalDate.now());
@@ -53,6 +56,7 @@ public class ContractServiceImpl implements ContractService {
                 .build());
         Contract contract = modelMapper.map(contractCreateDto, Contract.class);
         contract.setPowerMeter(newPowerMeter);
+        System.out.println(contract);
         return contractRepository.save(contract);
     }
 
@@ -100,6 +104,7 @@ public class ContractServiceImpl implements ContractService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
         contract.setProcessingEmployee(employee);
+        contract.setContractStatus(ContractStatus.builder().id(5).build());
         return contractRepository.save(contract);
     }
 
@@ -129,7 +134,61 @@ public class ContractServiceImpl implements ContractService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String endDate = LocalDate.now().format(formatter);
         contract.setEndDate(endDate);
+        contract.setContractStatus(ContractStatus.builder().id(3).build());
         return contractRepository.save(contract);
 
+    }
+
+    @Override
+    public ContractStatusGetDto getContractStatusByClientId(Integer clientId) {
+//        Contract contract = contractRepository.findByClientId(clientId);
+//        if (contract != null){
+//
+//        }
+        List<Contract> contract = contractRepository.findByClientId(clientId);
+        if (contract != null){
+
+            ContractStatusGetDto contractStatusGetDto = modelMapper.map(contract.get(0), ContractStatusGetDto.class);
+            contractStatusGetDto.setContractId(contract.get(0).getId());
+            return contractStatusGetDto;
+        }
+        else
+            return null;
+
+    }
+
+    @Override
+    public Contract rejectContract(Integer contractId, Integer employeeId) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new EntityNotFoundException("Contract not found with id: " + contractId));
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
+        // Định dạng LocalDate.now() sang String với định dạng yyyy-MM-dd
+        PowerMeter powerMeter = contract.getPowerMeter();
+        powerMeter.setStatus(false);
+        powerMeterRepository.save(powerMeter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String endDate = LocalDate.now().format(formatter);
+        contract.setEndDate(endDate);
+        contract.setProcessingEmployee(employee);
+        contract.setContractStatus(ContractStatus.builder().id(4).build());
+        return contractRepository.save(contract);
+    }
+    @Transactional
+    @Override
+    public String cancelRegisterByClientId(Integer clientId) {
+        if (clientRepository.existsById(clientId)) {
+            System.out.println(clientId);
+            Contract contract = contractRepository.findByClientIdAndStatusId(clientId, 1);
+            if (contract != null){
+                Integer powerMeterId = contract.getPowerMeter().getId();
+                contractRepository.deleteById(contract.getId());
+                powerMeterRepository.deleteById(contract.getPowerMeter().getId());
+                return "Hủy đăng ký thành công";
+            }
+        } else {
+            throw new EntityNotFoundException("Client not found with id: " + clientId);
+        }
+        return "";
     }
 }

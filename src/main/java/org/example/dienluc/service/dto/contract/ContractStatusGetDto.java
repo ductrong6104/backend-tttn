@@ -9,14 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContractGetDto {
+public class ContractStatusGetDto {
     private Integer contractId;
-    private String firstName;
-    private String lastName;
-    private String startDate;
-    private String endDate;
-    private String electricitySupplyAddress;
-    private String electricTypeName;
-    private String processingEmployeeIdAndName;
+    private Integer statusId;
     private String nameStatus;
 }

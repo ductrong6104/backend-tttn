@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BillServiceImpl implements BillService {
@@ -46,8 +47,8 @@ public class BillServiceImpl implements BillService {
     @Override
     public Bill createNewBill(BillCreateDto billCreateDto) {
         Bill bill = modelMapper.map(billCreateDto, Bill.class);
+        System.out.println(bill);
         bill.setPaymentDate(null);
-        bill.setId(null);
         return billRepository.save(bill);
     }
 
@@ -95,5 +96,28 @@ public class BillServiceImpl implements BillService {
 
         return billGeneratePdfDto;
 
+    }
+
+    @Override
+    public List<BillOfClientDto> getUnpaidInvoicesByClientId(Integer clientId) {
+        return billRepository.findByClientIdAndStatus(clientId, false).stream()
+                .map(bill ->{
+                   BillOfClientDto billOfClientDto = modelMapper.map(bill, BillOfClientDto.class);
+                   billOfClientDto.setPaymentStatus(bill.getStatus());
+                   return billOfClientDto;
+                } )
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<BillOfClientDto> getAllInvoicesByClientId(Integer clientId) {
+        return billRepository.getAllInvoicesByClientId(clientId).stream()
+                .map(bill -> {
+                    BillOfClientDto billOfClientDto = modelMapper.map(bill, BillOfClientDto.class);
+                    billOfClientDto.setPaymentStatus(bill.getStatus());
+                    return billOfClientDto;
+                })
+                .collect(Collectors.toList());
     }
 }

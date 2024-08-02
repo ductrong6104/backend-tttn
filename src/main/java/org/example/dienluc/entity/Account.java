@@ -35,4 +35,8 @@ public class Account {
     private List<Employee> employees;
     @OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Client> clients;
+    @PrePersist
+    protected void onCreate() {
+        disabled = false;
+    }
 }

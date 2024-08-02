@@ -11,11 +11,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class BillCreateDto {
-    private Integer id;
     private String invoiceDate;
     private String paymentDueDate;
     private BigDecimal totalAmount;
-    private String paymentDate;
-    private Boolean status;
-
+    private Integer electricRecordingId;
+    private Integer invoiceCreatorId;
 }

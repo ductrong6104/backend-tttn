@@ -18,4 +18,8 @@ public interface BillService {
     public Bill updateStatusBill(Integer billId, Boolean status);
 
     public BillGeneratePdfDto getBillToGeneratePdf(Integer billId, Integer clientId);
+
+    public List<BillOfClientDto> getUnpaidInvoicesByClientId(Integer clientId);
+
+    public List<BillOfClientDto> getAllInvoicesByClientId(Integer clientId);
 }

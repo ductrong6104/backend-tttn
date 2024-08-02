@@ -42,7 +42,7 @@ public class Client {
     @Column(name = "SDT", length = 10)
     private String phone;
     @Nationalized
-    @Column(name = "DIACHI", length = 100)
+    @Column(name = "DIACHI")
     private String address;
     @Pattern(regexp = Constants.CCCD_REGEX, message = "Invalid citizen identification number")
     @Column(name = "CCCD", length = 12)

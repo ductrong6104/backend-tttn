@@ -20,4 +20,6 @@ public class EmployeeDto {
     private String email;
     private String identityCard;
     private Boolean resignation;
+    private String username;
+    private String password;
 }

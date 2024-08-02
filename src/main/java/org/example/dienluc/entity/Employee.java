@@ -36,7 +36,7 @@ public class Employee {
     @Column(name = "NGAYSINH")
     private String birthday;
     @Nationalized
-    @Column(name = "DIACHI", length = 100)
+    @Column(name = "DIACHI")
     private String address;
     @Pattern(regexp = Constants.PHONE_REGEX, message = "Invalid phone number")
     @Column(name = "SDT", length = 10, unique = true)
@@ -56,4 +56,5 @@ public class Employee {
     public String getIdAndFullName(){
         return id + "-" + firstName + " " + lastName;
     }
+
 }

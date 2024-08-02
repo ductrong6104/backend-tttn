@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.Inet4Address;
+import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/contracts")
@@ -24,6 +25,24 @@ public class ContractController {
                 .data(contractService.getAllContract())
                 .message("create new contract")
                 .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @GetMapping("/client/{clientId}/status")
+    public ResponseEntity<?> getContractStatusByClientId(@PathVariable("clientId") Integer clientId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(contractService.getContractStatusByClientId(clientId))
+                .message("get contract status")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @DeleteMapping("/cancel-registers/{clientId}")
+    public ResponseEntity<?> cancelRegisterByClientId(@PathVariable("clientId") Integer clientId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(contractService.cancelRegisterByClientId(clientId))
+                .message("cancel register")
+                .status(HttpStatus.NO_CONTENT.value())
                 .build();
         return ResponseEntity.ok(responseData);
     }
@@ -68,6 +87,15 @@ public class ContractController {
         ResponseData responseData = ResponseData.builder()
                 .data(contractService.terminateContract(contractId))
                 .message("terminate contract")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @PutMapping("/{contractId}/reject/{employeeId}")
+    public ResponseEntity<?> rejectContract(@PathVariable Integer contractId, @PathVariable Integer employeeId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(contractService.rejectContract(contractId, employeeId))
+                .message("reject contract")
                 .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(responseData);

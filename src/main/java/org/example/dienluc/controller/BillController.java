@@ -55,6 +55,30 @@ public class BillController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
+
+    @GetMapping("/unpaid-invoice-client/{clientId}")
+    public ResponseEntity<?> getUnpaidInvoicesByClientId(@PathVariable Integer clientId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(billService.getUnpaidInvoicesByClientId(clientId))
+                .message("get unpaid invoices of client")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/all-invoice-client/{clientId}")
+    public ResponseEntity<?> getAllInvoicesByClientId(@PathVariable Integer clientId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(billService.getAllInvoicesByClientId(clientId))
+                .message("get all invoices of client")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+
+
     @PutMapping("/{billId}/status")
     public ResponseEntity<?> updateStatusBill(@PathVariable Integer billId, @RequestBody UpdateBillStatusRequest updateBillStatusRequest) {
         ResponseData responseData = ResponseData.builder()

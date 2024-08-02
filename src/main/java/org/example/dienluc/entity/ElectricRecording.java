@@ -34,7 +34,6 @@ public class ElectricRecording {
     @JoinColumn(name = "IDDONGHODIEN", nullable = false)
     private PowerMeter powerMeter;
 
-    @NotNull
     @Column(name = "NGAYGHICSD", nullable = false)
     private String recordingDate;
 
@@ -43,5 +42,10 @@ public class ElectricRecording {
 
     @Column(name = "CHISOCU")
     private Double oldIndex;
-
+    @PrePersist
+    protected void onCreate(){
+        recordingDate = null;
+        newIndex = null;
+        oldIndex = null;
+    }
 }
