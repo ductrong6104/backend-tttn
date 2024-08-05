@@ -4,16 +4,15 @@ package org.example.dienluc.service.serviceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.dienluc.entity.Account;
 import org.example.dienluc.entity.Client;
+import org.example.dienluc.entity.Employee;
 import org.example.dienluc.entity.Role;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.repository.AccountRepository;
+import org.example.dienluc.repository.EmployeeRepository;
 import org.example.dienluc.repository.RoleRepository;
 import org.example.dienluc.service.AccountService;
 import org.example.dienluc.service.dto.ResponseCheck;
-import org.example.dienluc.service.dto.account.AccountCreateDto;
-import org.example.dienluc.service.dto.account.AccountGetDto;
-import org.example.dienluc.service.dto.account.AccountNewDto;
-import org.example.dienluc.service.dto.account.AccountSiginDto;
+import org.example.dienluc.service.dto.account.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,11 +28,13 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public AccountServiceImpl(AccountRepository accountRepository, ModelMapper modelMapper, RoleRepository roleRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, ModelMapper modelMapper, RoleRepository roleRepository, EmployeeRepository employeeRepository) {
         this.accountRepository = accountRepository;
         this.modelMapper = modelMapper;
         this.roleRepository = roleRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -95,12 +96,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<AccountGetDto> getAccountOfEmployees() {
-        return accountRepository.findByRoleId(2).stream()
+        Role role = roleRepository.findByName("Nhân viên")
+                .orElseThrow(() -> new EntityNotFoundException("Role not found with name: " + "Nhân viên"));
+
+        return accountRepository.findByRole(role).stream()
                 .map(account ->{
                     AccountGetDto accountGetDto = modelMapper.map(account, AccountGetDto.class);
                     accountGetDto.setPassword("********");
-                    if (!account.getEmployees().isEmpty())
-                        accountGetDto.setEmployeeIdAndName(account.getEmployees().get(0).getIdAndFullName());
+//                    if (!account.getEmployees().isEmpty())
+//                        accountGetDto.setEmployeeIdAndName(account.getEmployees().get(0).getIdAndFullName());
                     return accountGetDto;
                 } )
                 .collect(Collectors.toList());
@@ -117,4 +121,14 @@ public class AccountServiceImpl implements AccountService {
             throw new EntityNotFoundException("Account not found with username: " + username);
         }
     }
+
+    @Override
+    public Account updateAccount(Integer accountId, AccountUpdateDto accountUpdateDto) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found with name: " + accountId));
+        account.setDisabled(accountUpdateDto.getDisabled());
+        return accountRepository.save(account);
+    }
+
+
 }

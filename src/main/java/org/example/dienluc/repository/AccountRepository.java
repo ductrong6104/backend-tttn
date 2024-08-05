@@ -13,8 +13,7 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     public Optional<Account> findByUsername(String username);
     public Optional<Account> findByUsernameAndPasswordAndRole(String username, String password, Role role);
-    @Query("SELECT a from Account a where a.role.id = ?1")
-    public List<Account> findByRoleId(Integer id);
+    public List<Account> findByRole(Role role);
     public Boolean existsByUsername(String username);
     public Integer deleteByUsername(String username);
 }

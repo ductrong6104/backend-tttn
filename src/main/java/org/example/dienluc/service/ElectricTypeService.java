@@ -11,4 +11,6 @@ public interface ElectricTypeService {
     public ElectricType createElectricType(ElectricTypeCreateDto electricTypeCreateDto);
 
     public String  deleteElectricType(Integer electricTypeId);
+
+    public ElectricType updateElectricType(Integer electricTypeId, ElectricTypeCreateDto electricTypeCreateDto);
 }

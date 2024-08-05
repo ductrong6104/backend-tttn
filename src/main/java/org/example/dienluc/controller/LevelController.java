@@ -44,6 +44,15 @@ public class LevelController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @PutMapping("/{levelId}")
+    public ResponseEntity<?> updateLevel(@PathVariable Integer levelId, @RequestBody LevelCreateDto levelCreateDto) {
+        ResponseData responseData = ResponseData.builder()
+                .data(levelService.updateLevel(levelId, levelCreateDto))
+                .message("update level")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
     @DeleteMapping("{levelId}")
     public ResponseEntity<?> deleteLevelById(@PathVariable Integer levelId) {
         ResponseData responseData = ResponseData.builder()

@@ -40,4 +40,12 @@ public class ElectricTypeServiceImpl implements ElectricTypeService {
             throw new EntityNotFoundException("ElectricType not found with id: " + electricTypeId);
         }
     }
+
+    @Override
+    public ElectricType updateElectricType(Integer electricTypeId, ElectricTypeCreateDto electricTypeCreateDto) {
+        ElectricType electricType = electricTypeRepository.findById(electricTypeId)
+                .orElseThrow(() -> new EntityNotFoundException("ElectricType not found with id: " + electricTypeId));
+        electricType.setName(electricTypeCreateDto.getName());
+        return electricTypeRepository.save(electricType);
+    }
 }

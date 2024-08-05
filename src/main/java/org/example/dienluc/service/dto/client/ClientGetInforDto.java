@@ -1,4 +1,4 @@
-package org.example.dienluc.service.dto.employee;
+package org.example.dienluc.service.dto.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,18 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeDto {
+public class ClientGetInforDto {
     private Integer id;
     private String firstName;
     private String lastName;
-    private Boolean gender;
+    private String phone;
+    private String identityCard;
     private String birthday;
     private String address;
-    private String phone;
     private String email;
-    private String identityCard;
-    private Boolean resignation;
-    private String username;
-    private String password;
-    private Integer roleId;
 }

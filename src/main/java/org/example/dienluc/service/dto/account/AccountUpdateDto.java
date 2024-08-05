@@ -9,10 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountGetDto {
-    private Integer id;
-    private String username;
-    private String password;
+public class AccountUpdateDto {
     private Boolean disabled;
-    private String employeeIdAndName;
 }

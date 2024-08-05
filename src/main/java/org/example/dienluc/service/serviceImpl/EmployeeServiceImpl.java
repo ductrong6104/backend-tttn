@@ -1,19 +1,24 @@
 package org.example.dienluc.service.serviceImpl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.dienluc.entity.Account;
+import org.example.dienluc.entity.Client;
 import org.example.dienluc.entity.Employee;
 import org.example.dienluc.entity.Role;
 import org.example.dienluc.repository.AccountRepository;
 import org.example.dienluc.repository.EmployeeRepository;
 import org.example.dienluc.service.EmployeeService;
+import org.example.dienluc.service.dto.ResponseCheck;
 import org.example.dienluc.service.dto.employee.EmployeeChooseDto;
 import org.example.dienluc.service.dto.employee.EmployeeDto;
+import org.example.dienluc.service.dto.employee.EmployeeGetDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,9 +34,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         this.accountRepository = accountRepository;
     }
     @Override
-    public List<EmployeeDto> getAllEmployee() {
+    public List<EmployeeGetDto> getAllEmployee() {
         return employeeRepository.findAll().stream()
-                .map(employee -> modelMapper.map(employee, EmployeeDto.class))
+                .map(employee -> modelMapper.map(employee, EmployeeGetDto.class))
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Account account = accountRepository.save(Account.builder()
                 .username(employeeDto.getUsername())
                 .password(employeeDto.getPassword())
-                .role(Role.builder().id(2).build())
+                .role(Role.builder().id(employeeDto.getRoleId()).build())
                 .build());
         Employee employee = modelMapper.map(employeeDto, Employee.class);
         employee.setAccount(account);
@@ -63,5 +68,41 @@ public class EmployeeServiceImpl implements EmployeeService {
                     return employeeChooseDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Employee updateEmployee(Integer employeeId, EmployeeDto employeeDto) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
+        Employee employeeUpdate = modelMapper.map(employeeDto, Employee.class);
+        employeeUpdate.setAccount(employee.getAccount());
+        return employeeRepository.save(employeeUpdate);
+    }
+
+    @Override
+    public ResponseCheck checkEmailOfEmployeeExists(String email) {
+        Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
+        if (optionalEmployee.isPresent()){
+            return new ResponseCheck(true);
+        }
+        return new ResponseCheck(false);
+    }
+
+    @Override
+    public ResponseCheck checkPhoneOfEmployeeExists(String phone) {
+        Optional<Employee> optionalEmployee = employeeRepository.findByPhone(phone);
+        if (optionalEmployee.isPresent()){
+            return new ResponseCheck(true);
+        }
+        return new ResponseCheck(false);
+    }
+
+    @Override
+    public ResponseCheck checkIdentityCardOfEmployeeExists(String identityCard) {
+        Optional<Employee> optionalEmployee = employeeRepository.findByIdentityCard(identityCard);
+        if (optionalEmployee.isPresent()){
+            return new ResponseCheck(true);
+        }
+        return new ResponseCheck(false);
     }
 }

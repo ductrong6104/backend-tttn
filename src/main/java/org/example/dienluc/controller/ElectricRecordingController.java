@@ -2,7 +2,10 @@ package org.example.dienluc.controller;
 
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.ElectricRecordingService;
+import org.example.dienluc.service.dto.account.AccountUpdateDto;
 import org.example.dienluc.service.dto.electricRecording.ElectricRecordingCreateDto;
+import org.example.dienluc.service.dto.electricRecording.ElectricRecordingUpdateByEmployeeDto;
+import org.example.dienluc.service.dto.electricRecording.ElectricRecordingUpdateDto;
 import org.example.dienluc.service.dto.statistical.client.ElectricityUsedInYearRequestDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +66,46 @@ public class ElectricRecordingController {
         return ResponseEntity.ok(responseData);
     }
 
+    @PutMapping("/{electricRecordingId}")
+    public ResponseEntity<?> updateElectricRecording(@PathVariable Integer electricRecordingId, @RequestBody ElectricRecordingUpdateDto electricRecordingUpdateDto) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.updateElectricRecording(electricRecordingId, electricRecordingUpdateDto))
+                .message("update employee or power meter electric recording")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @DeleteMapping("/{electricRecordingId}")
+    public ResponseEntity<?> deleteElectricRecording(@PathVariable Integer electricRecordingId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.deleteElectricRecording(electricRecordingId))
+                .message("delete electric recording")
+                .status(HttpStatus.NO_CONTENT.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @DeleteMapping("/employee/{electricRecordingId}")
+    public ResponseEntity<?> deleteRecordingByEmployee(@PathVariable Integer electricRecordingId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.deleteRecordingByEmployee(electricRecordingId))
+                .message("delete electric recording")
+                .status(HttpStatus.NO_CONTENT.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PutMapping("/employee/{electricRecordingId}")
+    public ResponseEntity<?> updateElectricRecordingByEmployee(@PathVariable Integer electricRecordingId, @RequestBody ElectricRecordingUpdateByEmployeeDto electricRecordingUpdateByEmployeeDto) {
+//        System.out.println("electricRecordingId"  + electricRecordingId);
+//        System.out.println("electricRecordingUpdateByEmployeeDto"  + electricRecordingUpdateByEmployeeDto);
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.updateElectricRecordingByEmployee(electricRecordingId, electricRecordingUpdateByEmployeeDto))
+                .message("update electric recording by employee")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 
 
 }

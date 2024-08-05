@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ElectricRecordingAssignedDto {
-    private Integer id;
+public class ElectricRecordingUpdateByEmployeeDto {
     private Integer powerMeterId;
-    private String installationLocation;
+    private Integer employeeId;
     private String recordingDate;
-    private String employeeNameAndId;
-
+    private Double newIndex;
 }

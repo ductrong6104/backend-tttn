@@ -50,4 +50,13 @@ public class LevelServiceImpl implements LevelService {
                 .map(level -> modelMapper.map(level, LevelGetDto.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Level updateLevel(Integer levelId, LevelCreateDto levelCreateDto) {
+        Level level = levelRepository.findById(levelId)
+                .orElseThrow(() -> new EntityNotFoundException("Level not found with id: " + levelId));
+        level.setFirstLevel(levelCreateDto.getFirstLevel());
+        level.setSecondLevel(levelCreateDto.getSecondLevel());
+        return levelRepository.save(level);
+    }
 }

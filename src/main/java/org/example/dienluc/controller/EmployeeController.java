@@ -3,6 +3,7 @@ package org.example.dienluc.controller;
 import jakarta.validation.Valid;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.EmployeeService;
+import org.example.dienluc.service.dto.UpdateEmailRequest;
 import org.example.dienluc.service.dto.employee.EmployeeDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,42 @@ public class EmployeeController {
         return ResponseEntity.ok(responseData);
     }
 
+
+    @PutMapping("/{employeeId}")
+    public ResponseEntity<?> updateEmployee(@PathVariable Integer employeeId, @RequestBody EmployeeDto employeeDto) {
+        ResponseData responseData = ResponseData.builder()
+                .data(employeeService.updateEmployee(employeeId, employeeDto))
+                .message("get all employee")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmailOfClientExists(@Valid @RequestBody UpdateEmailRequest updateEmailRequest) {
+        ResponseData responseData = ResponseData.builder()
+                .data(employeeService.checkEmailOfEmployeeExists(updateEmailRequest.getEmail()))
+                .message("check email of employee exists")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @GetMapping("/check-phone")
+    public ResponseEntity<?> checkPhoneOfEmployeeExists(@RequestParam(name = "phone") String phone) {
+        ResponseData responseData = ResponseData.builder()
+                .data(employeeService.checkPhoneOfEmployeeExists(phone))
+                .message("check email of employee exists")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @GetMapping("/check-identityCard")
+    public ResponseEntity<?> checkIdentityCardOfEmployeeExists(@RequestParam(name = "identityCard") String identityCard) {
+        ResponseData responseData = ResponseData.builder()
+                .data(employeeService.checkIdentityCardOfEmployeeExists(identityCard))
+                .message("check email of employee exists")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 
 }

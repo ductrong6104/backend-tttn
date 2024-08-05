@@ -3,6 +3,7 @@ package org.example.dienluc.repository;
 import org.example.dienluc.entity.ElectricRecording;
 import org.example.dienluc.entity.PowerMeter;
 import org.example.dienluc.service.dto.electricRecording.ElectricRecordingGetDto;
+import org.example.dienluc.service.dto.electricRecording.ElectricRecordingRecentDto;
 import org.example.dienluc.service.dto.powerMeter.PowerMeterAvailableDto;
 import org.example.dienluc.service.dto.statistical.client.ElectricityUsedByClientDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +36,21 @@ public interface ElectricRecordingRepository extends JpaRepository<ElectricRecor
 
     @Query("Select er from ElectricRecording er where er.powerMeter.id = ?1 and er.employee.id = ?2 and er.recordingDate is null")
     public Optional<ElectricRecording> findNotAssignedByPowerMeterIdAndEmployeeIdAndRecordingDate(Integer powerMeterId, Integer employeeId);
-    @Query(value = "SELECT MONTH(NGAYGHICSD) AS month, (CHISOMOI - CHISOCU) AS electricUsed from ghidien where IDDONGHODIEN in (select IDDONGHODIEN from HOPDONG where IDKHACHHANG = :clientId)\n" +
-            "and year(NGAYGHICSD) = :year",
+    @Query(value = "SELECT MONTH(NGAYGHICSD) AS month, SUM(CHISOMOI - CHISOCU) AS electricUsed from ghidien where IDDONGHODIEN in (select IDDONGHODIEN from HOPDONG where IDKHACHHANG = :clientId)\n" +
+            "and year(NGAYGHICSD) = :year GROUP BY MONTH(NGAYGHICSD)",
             nativeQuery = true)
     List<Object[]> getElectricityUsedInYearByClientId(@Param("clientId") Integer clientId, @Param("year") String year);
-
+    // convert GETDATE() sang DATE() để chỉ so sanh dddd,mm,yy không cần so hh,mm,ss
+    @Query(value = "SELECT IDNHANVIEN as employeeId, IDDONGHODIEN as powerMeterId\n" +
+            "FROM GHIDIEN \n" +
+            "WHERE IDDONGHODIEN = (SELECT IDDONGHODIEN FROM hopdong WHERE ID = ?1) \n" +
+            "AND NGAYGHICSD < CAST(GETDATE() AS DATE)\n" +
+            "AND NOT EXISTS (\n" +
+            "    SELECT ID\n" +
+            "    FROM GHIDIEN \n" +
+            "    WHERE IDDONGHODIEN = (SELECT IDDONGHODIEN FROM hopdong WHERE ID = ?1) \n" +
+            "    AND NGAYGHICSD = CAST(GETDATE() AS DATE)\n" +
+            ") GROUP BY IDNHANVIEN, IDDONGHODIEN", nativeQuery = true)
+    public List<Object[]> getElectricRecordingRecentByContract(Integer contractId);
+    public Optional<ElectricRecording> findByPowerMeterAndRecordingDateIsNull(PowerMeter powerMeter);
 }

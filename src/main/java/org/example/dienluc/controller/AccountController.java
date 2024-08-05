@@ -3,14 +3,18 @@ package org.example.dienluc.controller;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.AccountService;
 import org.example.dienluc.service.dto.account.AccountCreateDto;
+import org.example.dienluc.service.dto.account.AccountGetDto;
 import org.example.dienluc.service.dto.account.AccountSiginDto;
 
+import org.example.dienluc.service.dto.account.AccountUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+
+import java.util.List;
 
 /**
  * REST controller for managing account.
@@ -59,11 +63,13 @@ public class AccountController {
         return ResponseEntity.ok(accountService.login(accountSiginDto));
     }
 
-    @GetMapping("/employees")
+    @GetMapping("/employees/fix")
     public ResponseEntity<?> getAccountOfEmployees() {
+//        List<AccountGetDto> accounts = accountService.getAccountOfEmployees();
+//        System.out.println("Accounts: " + accounts); // Log dữ liệu trả về
         ResponseData responseData = ResponseData.builder()
                 .data(accountService.getAccountOfEmployees())
-                .message("create account of employees")
+                .message("get account of employees")
                 .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(responseData);
@@ -74,6 +80,18 @@ public class AccountController {
                 .data(accountService.deleteAccount(username))
                 .message("delete account")
                 .status(HttpStatus.NO_CONTENT.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PutMapping("/{accountId}")
+    public ResponseEntity<?> updateAccount(@PathVariable Integer accountId, @RequestBody AccountUpdateDto accountUpdateDto) {
+//        List<AccountGetDto> accounts = accountService.getAccountOfEmployees();
+//        System.out.println("Accounts: " + accounts); // Log dữ liệu trả về
+        ResponseData responseData = ResponseData.builder()
+                .data(accountService.updateAccount(accountId, accountUpdateDto))
+                .message("update account of employee")
+                .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(responseData);
     }

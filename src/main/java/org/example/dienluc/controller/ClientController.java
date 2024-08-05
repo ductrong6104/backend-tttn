@@ -3,8 +3,7 @@ package org.example.dienluc.controller;
 import jakarta.validation.Valid;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.ClientService;
-import org.example.dienluc.service.dto.ResponseCheck;
-import org.example.dienluc.service.dto.UpdateEmailRequest;
+import org.example.dienluc.service.dto.*;
 import org.example.dienluc.service.dto.client.ClientCreateDto;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -87,11 +86,57 @@ public class ClientController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @PutMapping("/{clientId}/phone")
+    public ResponseEntity<?> updatePhoneClient(@PathVariable Integer clientId, @RequestBody UpdatePhoneRequest updatePhoneRequest){
+        ResponseData responseData = ResponseData.builder()
+                .data(clientService.updatePhoneClient(clientId, updatePhoneRequest))
+                .message("update phone client")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PutMapping("/{clientId}/identityCard")
+    public ResponseEntity<?> updateIdentityCard(@PathVariable Integer clientId, @RequestBody UpdateIdentityCard updateIdentityCard){
+        ResponseData responseData = ResponseData.builder()
+                .data(clientService.updateIdentityCard(clientId, updateIdentityCard))
+                .message("update identity client")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @PutMapping("/{clientId}/birthday")
+    public ResponseEntity<?> updateBirthday(@PathVariable Integer clientId, @RequestBody UpdateBirthdayRequest updateBirthday){
+        ResponseData responseData = ResponseData.builder()
+                .data(clientService.updateBirthday(clientId, updateBirthday))
+                .message("update birthday client")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @PutMapping("/{clientId}/address")
+    public ResponseEntity<?> updateAddress(@PathVariable Integer clientId, @RequestBody UpdateAddressRequest updateAddress){
+        ResponseData responseData = ResponseData.builder()
+                .data(clientService.updateAddress(clientId, updateAddress))
+                .message("update address client")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
     @GetMapping("/{clientId}")
     public ResponseEntity<?> getClientById(@PathVariable Integer clientId){
         ResponseData responseData = ResponseData.builder()
                 .data(clientService.getClientById(clientId))
                 .message("get client by id")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+    @GetMapping("")
+    public ResponseEntity<?> getAllClient(){
+        ResponseData responseData = ResponseData.builder()
+                .data(clientService.getAllClient())
+                .message("get all client")
                 .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(responseData);

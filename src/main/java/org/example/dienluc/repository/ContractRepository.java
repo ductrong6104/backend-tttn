@@ -24,4 +24,6 @@ public interface ContractRepository extends JpaRepository<Contract, Integer> {
     public List<Contract> findByClientId(Integer clientId);
     @Query("SELECT c FROM Contract c where c.client.id = ?1 and c.contractStatus.id = ?2")
     Contract findByClientIdAndStatusId(Integer clientId, Integer statusId);
+
+
 }

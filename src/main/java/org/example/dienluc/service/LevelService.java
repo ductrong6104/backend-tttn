@@ -14,4 +14,6 @@ public interface LevelService {
     public String deleteLevelById(Integer levelId);
 
     public List<LevelGetDto> getLevelNotUseByElectricType(Integer electricTypeId);
+
+    public Level updateLevel(Integer levelId, LevelCreateDto levelCreateDto);
 }

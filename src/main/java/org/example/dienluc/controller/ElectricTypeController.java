@@ -35,6 +35,15 @@ public class ElectricTypeController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @PutMapping("/{electricTypeId}")
+    public ResponseEntity<?> updateElectricType(@PathVariable Integer electricTypeId,@RequestBody ElectricTypeCreateDto electricTypeCreateDto) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricTypeService.updateElectricType(electricTypeId, electricTypeCreateDto))
+                .message("update new electric type")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
     @DeleteMapping("/{electricTypeId}")
     public ResponseEntity<?> deleteElectricType(@PathVariable Integer electricTypeId) {
         ResponseData responseData = ResponseData.builder()

@@ -1,10 +1,7 @@
 package org.example.dienluc.service;
 
 import org.example.dienluc.entity.ElectricRecording;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingAssignedByEmployeeDto;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingAssignedDto;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingCreateDto;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingGetDto;
+import org.example.dienluc.service.dto.electricRecording.*;
 import org.example.dienluc.service.dto.powerMeter.PowerMeterAvailableDto;
 import org.example.dienluc.service.dto.statistical.client.ElectricityUsedByClientDto;
 
@@ -22,4 +19,13 @@ public interface ElectricRecordingService {
     public ElectricRecording updateElectricRecordingFirst(ElectricRecordingCreateDto electricRecordingCreateDto);
 
     public List<ElectricityUsedByClientDto> getElectricityUsedInYearByClientId(Integer clientId, String year);
+
+
+    public ElectricRecording updateElectricRecording(Integer electricRecordingId, ElectricRecordingUpdateDto electricRecordingUpdateDto);
+
+    public String deleteElectricRecording(Integer electricRecordingId);
+
+    public ElectricRecording updateElectricRecordingByEmployee(Integer electricRecordingId, ElectricRecordingUpdateByEmployeeDto electricRecordingUpdateByEmployeeDto);
+
+    public String deleteRecordingByEmployee(Integer electricRecordingId);
 }

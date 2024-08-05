@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContractGetDto {
-    private Integer contractId;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String startDate;

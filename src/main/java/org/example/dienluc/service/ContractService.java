@@ -2,17 +2,14 @@ package org.example.dienluc.service;
 
 import org.example.dienluc.entity.Contract;
 import org.example.dienluc.service.dto.ResponseCheck;
-import org.example.dienluc.service.dto.contract.ContractCreateDto;
-import org.example.dienluc.service.dto.contract.ContractGetDto;
-import org.example.dienluc.service.dto.contract.ContractStatusGetDto;
-import org.example.dienluc.service.dto.contract.RegistrationFormDto;
+import org.example.dienluc.service.dto.contract.*;
 
 import java.util.List;
 
 public interface ContractService {
     public Contract createContract(ContractCreateDto contractCreateDto);
 
-    public ResponseCheck checkContractExists(Integer clientId);
+    public ContractExistDto checkContractExists(Integer clientId);
 
     public List<RegistrationFormDto> getAllRegistrationForm();
 

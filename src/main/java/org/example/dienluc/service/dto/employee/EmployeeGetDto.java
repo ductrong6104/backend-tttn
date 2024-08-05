@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeDto {
+public class EmployeeGetDto {
     private Integer id;
     private String firstName;
     private String lastName;
@@ -20,7 +20,4 @@ public class EmployeeDto {
     private String email;
     private String identityCard;
     private Boolean resignation;
-    private String username;
-    private String password;
-    private Integer roleId;
 }

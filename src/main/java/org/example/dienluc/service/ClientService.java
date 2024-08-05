@@ -1,11 +1,12 @@
 package org.example.dienluc.service;
 
 import org.example.dienluc.entity.Client;
-import org.example.dienluc.service.dto.ResponseCheck;
-import org.example.dienluc.service.dto.UpdateEmailRequest;
-import org.example.dienluc.service.dto.UpdateEmailResponse;
+import org.example.dienluc.service.dto.*;
 import org.example.dienluc.service.dto.client.ClientCreateDto;
 import org.example.dienluc.service.dto.client.ClientGetDto;
+import org.example.dienluc.service.dto.client.ClientGetInforDto;
+
+import java.util.List;
 
 public interface ClientService {
     public Client createClient(ClientCreateDto clientCreateDto);
@@ -19,4 +20,14 @@ public interface ClientService {
     public UpdateEmailResponse updateEmailClient(Integer clientId, String email);
 
     public ClientGetDto getClientById(Integer clientId);
+
+    public List<ClientGetInforDto> getAllClient();
+
+    public UpdatePhoneResponse updatePhoneClient(Integer clientId, UpdatePhoneRequest updatePhoneRequest);
+
+    public UpdateIdentityCardResponse updateIdentityCard(Integer clientId, UpdateIdentityCard updateIdentityCard);
+
+    public UpdateBirthdayResponse updateBirthday(Integer clientId, UpdateBirthdayRequest updateBirthday);
+
+    public UpdateAddressResponse updateAddress(Integer clientId, UpdateAddressRequest updateAddress);
 }
