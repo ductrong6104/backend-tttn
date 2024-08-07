@@ -5,9 +5,7 @@ import org.example.dienluc.repository.ContractRepository;
 
 import org.example.dienluc.repository.ElectricRecordingRepository;
 import org.example.dienluc.service.StatisticalService;
-import org.example.dienluc.service.dto.statistical.client.AmountEveryMonthInEveryYearGetDto;
-import org.example.dienluc.service.dto.statistical.client.AmountEveryMonthInEveryYearRequestDto;
-import org.example.dienluc.service.dto.statistical.client.ElectricityUsedByClientDto;
+import org.example.dienluc.service.dto.statistical.client.*;
 import org.example.dienluc.service.dto.statistical.consumption.StatisticalComsumptionElectricTypeDto;
 import org.example.dienluc.util.MapperUtil;
 import org.springframework.stereotype.Service;
@@ -46,5 +44,13 @@ public class StatisticalServiceImpl implements StatisticalService {
         List<Object[]> results = billRepository.getAmountEveryMonthInEveryYear(amountEveryMonthInEveryYearRequestDto.getClientId(), amountEveryMonthInEveryYearRequestDto.getStartYear(), amountEveryMonthInEveryYearRequestDto.getEndYear());
         String[] fields = {"year", "month", "amount"};
         return MapperUtil.mapResults(results, AmountEveryMonthInEveryYearGetDto.class, fields);
+    }
+
+    @Override
+    public List<ConsumptionFromDateToDateGetDto> getConsumptionFromDateToDate(ConsumptionFromDateToDateDto consumptionFromDateToDateDto) {
+        List<Object[]> results = electricRecordingRepository.getConsumptionFromDateToDate(consumptionFromDateToDateDto.getFromDate(), consumptionFromDateToDateDto.getToDate());
+        String[] fields = {"dayMonth", "consumption"};
+
+        return MapperUtil.mapResults(results, ConsumptionFromDateToDateGetDto.class, fields);
     }
 }

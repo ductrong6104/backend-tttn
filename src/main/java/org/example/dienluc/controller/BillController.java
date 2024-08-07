@@ -97,4 +97,14 @@ public class BillController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
+    @GetMapping("/{billId}/client/{clientId}/pdf-payment")
+    public ResponseEntity<?> getBillToGeneratePdfPayment(@PathVariable Integer billId, @PathVariable Integer clientId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(billService.getBillToGeneratePdfPayment(billId, clientId))
+                .message("get bill of client payment")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 }

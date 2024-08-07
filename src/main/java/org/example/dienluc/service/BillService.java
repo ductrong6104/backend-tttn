@@ -22,4 +22,6 @@ public interface BillService {
     public List<BillOfClientDto> getUnpaidInvoicesByClientId(Integer clientId);
 
     public List<BillOfClientDto> getAllInvoicesByClientId(Integer clientId);
+
+    public BillGeneratePdfPaymentDto getBillToGeneratePdfPayment(Integer billId, Integer clientId);
 }

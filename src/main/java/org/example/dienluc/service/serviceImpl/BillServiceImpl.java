@@ -3,10 +3,13 @@ package org.example.dienluc.service.serviceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.dienluc.entity.Bill;
 import org.example.dienluc.entity.Client;
+import org.example.dienluc.entity.ElectricityPrice;
 import org.example.dienluc.repository.BillRepository;
 import org.example.dienluc.repository.ClientRepository;
+import org.example.dienluc.repository.ElectricityPriceRepository;
 import org.example.dienluc.service.BillService;
 import org.example.dienluc.service.dto.bill.*;
+import org.example.dienluc.service.dto.electricityPrice.ElectricPriceGetPriceDto;
 import org.example.dienluc.service.dto.powerMeter.PowerMeterRecordableDto;
 import org.example.dienluc.util.DateUtil;
 import org.example.dienluc.util.MapperUtil;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,12 +32,14 @@ public class BillServiceImpl implements BillService {
     private final BillRepository billRepository;
     private final ModelMapper modelMapper;
     private final ClientRepository clientRepository;
+    private final ElectricityPriceRepository electricityPriceRepository;
 
 
-    public BillServiceImpl(BillRepository billRepository, ModelMapper modelMapper, ModelMapper modelMapper1, ClientRepository clientRepository) {
+    public BillServiceImpl(BillRepository billRepository, ModelMapper modelMapper, ModelMapper modelMapper1, ClientRepository clientRepository, ElectricityPriceRepository electricityPriceRepository) {
         this.billRepository = billRepository;
         this.modelMapper = modelMapper1;
         this.clientRepository = clientRepository;
+        this.electricityPriceRepository = electricityPriceRepository;
     }
     @Transactional
     @Override
@@ -119,5 +125,31 @@ public class BillServiceImpl implements BillService {
                     return billOfClientDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BillGeneratePdfPaymentDto getBillToGeneratePdfPayment(Integer billId, Integer clientId) {
+        BillGeneratePdfPaymentDto billGeneratePdfPaymentDto = new BillGeneratePdfPaymentDto();
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("Client not found with id: " + clientId));
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> new EntityNotFoundException("Bill not found with id: " + billId));
+        Double electricUsed = bill.getElectricRecording().getNewIndex() - bill.getElectricRecording().getOldIndex();
+        List<Object[]> results = electricityPriceRepository.findPriceByElectricTypeAndElectricUsed(electricUsed, client.getContracts().get(0).getElectricType().getId());
+        String[] fields = {"price"};
+        billGeneratePdfPaymentDto = modelMapper.map(client, BillGeneratePdfPaymentDto.class);
+        billGeneratePdfPaymentDto = modelMapper.map(bill, BillGeneratePdfPaymentDto.class);
+        List<ElectricPriceGetPriceDto> electricPriceGetPriceDtos = MapperUtil.mapResults(results, ElectricPriceGetPriceDto.class, fields);
+        if (!electricPriceGetPriceDtos.isEmpty())
+            System.out.println("hihihi");
+            billGeneratePdfPaymentDto.setPrice(electricPriceGetPriceDtos.get(0).getPrice().toString());
+//        System.out.println("client: " + client.toString());
+        billGeneratePdfPaymentDto.setFullName(client.getFullName());
+        billGeneratePdfPaymentDto.setAddress(client.getAddress());
+
+        billGeneratePdfPaymentDto.setToDate(bill.getElectricRecording().getRecordingDate());
+        billGeneratePdfPaymentDto.setTotalAmount(bill.getTotalAmount().toString());
+        System.out.println(billGeneratePdfPaymentDto);
+        return billGeneratePdfPaymentDto;
     }
 }

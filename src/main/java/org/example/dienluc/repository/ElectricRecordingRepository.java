@@ -53,4 +53,6 @@ public interface ElectricRecordingRepository extends JpaRepository<ElectricRecor
             ") GROUP BY IDNHANVIEN, IDDONGHODIEN", nativeQuery = true)
     public List<Object[]> getElectricRecordingRecentByContract(Integer contractId);
     public Optional<ElectricRecording> findByPowerMeterAndRecordingDateIsNull(PowerMeter powerMeter);
+    @Query(value = "select concat(DAY(NGAYGHICSD), '/', MONTH(NGAYGHICSD)) as dayMonth, SUM(CHISOMOI- CHISOCU) as consumption from GHIDIEN where NGAYGHICSD >= '2024-07-01' and NGAYGHICSD <= '2024-08-01' GROUP BY NGAYGHICSD", nativeQuery = true)
+    public List<Object[]> getConsumptionFromDateToDate(String fromDate, String toDate);
 }
