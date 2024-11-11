@@ -1,15 +1,19 @@
 package org.example.dienluc.controller;
 
+import org.example.dienluc.entity.ElectricRecording;
+import org.example.dienluc.entity.Graph;
+import org.example.dienluc.entity.Location;
+import org.example.dienluc.entity.LocationDistance;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.ElectricRecordingService;
-import org.example.dienluc.service.dto.account.AccountUpdateDto;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingCreateDto;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingUpdateByEmployeeDto;
-import org.example.dienluc.service.dto.electricRecording.ElectricRecordingUpdateDto;
-import org.example.dienluc.service.dto.statistical.client.ElectricityUsedInYearRequestDto;
+import org.example.dienluc.service.dto.electricRecording.*;
+import org.example.dienluc.service.dto.electricType.ElectricTypeCreateDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Comparator;
+import java.util.List;
 
 @RestController
 @RequestMapping("/electric-recordings")
@@ -106,6 +110,75 @@ public class ElectricRecordingController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @PostMapping("/assigned/{employeeId}/shortest")
+    public ResponseEntity<?> getShortestPath(@PathVariable Integer employeeId, @RequestBody Location locationCurrent) {
+        List<ElectricRecordingAssignedByEmployeeDto> electricRecordingAssignedByEmployeeDtoList = electricRecordingService.getAssignedElectricRecordingsByEmployeeId(employeeId);
+        Graph graph = new Graph();
+        // Duyệt qua từng DTO và thêm các địa điểm vào đồ thị
+        electricRecordingAssignedByEmployeeDtoList.forEach(dto ->
+                graph.addLocation(dto.getPowerMeterId(), dto.getLatitude(), dto.getLongitude())
+        );
+//        graph.addLocation(12322, 10.846288060343714, 106.78625800058298);
+//        electricRecordingAssignedByEmployeeDtoList.add(ElectricRecordingAssignedByEmployeeDto
+//                .builder()
+//                .powerMeterId(12322)
+//                .build());
+        // Thêm các cạnh giữa tất cả các địa điểm
+//        for (int i = 0; i < electricRecordingAssignedByEmployeeDtoList.size() - 1; i++) {
+//            for (int j = i + 1; j < electricRecordingAssignedByEmployeeDtoList.size(); j++) {
+//                int fromId = electricRecordingAssignedByEmployeeDtoList.get(i).getPowerMeterId();
+//                int toId = electricRecordingAssignedByEmployeeDtoList.get(j).getPowerMeterId();
+//
+//                graph.addEdge(fromId, toId);
+//            }
+//        }
+        // Tìm đường đi ngắn nhất từ HCM (1) đến Da Lat (4)
+//        List<Integer> path = graph.dijkstra(electricRecordingAssignedByEmployeeDtoList.get(4).getPowerMeterId(), electricRecordingAssignedByEmployeeDtoList.get(1).getPowerMeterId());
+        // Tính khoảng cách từ vị trí hiện tại đến từng đồng hồ và lưu vào danh sách
+        List<LocationDistance> distances = electricRecordingAssignedByEmployeeDtoList.stream()
+                .map(dto -> {
+                    double distance = graph.haversine(
+                            locationCurrent,
+                            new Location(dto.getLatitude(), dto.getLongitude())
+                    );
+                    return new LocationDistance(dto.getPowerMeterId(), distance);
+                })
+                .sorted(Comparator.comparingDouble(LocationDistance::getDistance)) // Sắp xếp theo khoảng cách tăng dần
+                .toList();
 
+        // Tạo phản hồi
+        ResponseData responseData = ResponseData.builder()
+                .data(distances)
+                .message("Sorted locations by distance")
+                .status(HttpStatus.OK.value())
+                .build();
+//        System.out.println("Đường đi ngắn nhất: " + path);
+//        ResponseData responseData = ResponseData.builder()
+//                .data(path)
+//                .message("get shortest path")
+//                .status(HttpStatus.OK.value())
+//                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/recording-history/{employeeId}")
+    public ResponseEntity<?> getRecordingHistoryByEmployee(@PathVariable Integer employeeId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.getRecordingHistoryByEmployee(employeeId))
+                .message("get recording history by employee")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PostMapping("/automation-assignment")
+    public ResponseEntity<?> createAutomationAssignment(@RequestBody List<ElectricRecordingAutoAssign> electricRecordingAutoAssign) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.automationAssignment(electricRecordingAutoAssign))
+                .message("create electric recording automation assignment")
+                .status(HttpStatus.CREATED.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 
 }

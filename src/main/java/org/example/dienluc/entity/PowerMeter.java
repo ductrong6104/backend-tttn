@@ -31,6 +31,11 @@ public class PowerMeter {
     private String installationLocation;
     @Column(name = "TRANGTHAI")
     private Boolean status;
+    @Column(name = "KINHDO")
+    private Double longitude;
+    @Column(name = "VIDO")
+    private Double latitude;
+    @JsonIgnore
     @OneToOne(mappedBy = "powerMeter")
     private Contract contract;
     @PrePersist

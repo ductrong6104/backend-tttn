@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ElectricRecordingAssignedByEmployeeDto {
+public class ElectricRecordingHistoryByEmployeeDto {
+    private Integer id;
     private Integer powerMeterId;
-    private String installationLocation;
+    private String recordingDate;
     private Double oldIndex;
-    private Double longitude;
-    private Double latitude;
+    private Double newIndex;
 }

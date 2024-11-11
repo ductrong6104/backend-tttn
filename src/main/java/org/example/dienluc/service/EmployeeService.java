@@ -22,4 +22,6 @@ public interface EmployeeService {
     public ResponseCheck checkPhoneOfEmployeeExists(String phone);
 
     public ResponseCheck checkIdentityCardOfEmployeeExists(String identityCard);
+
+    public Employee getEmployeeById(Integer employeeId);
 }

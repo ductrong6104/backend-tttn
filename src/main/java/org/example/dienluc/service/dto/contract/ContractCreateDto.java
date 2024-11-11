@@ -14,4 +14,6 @@ public class ContractCreateDto {
     private String startDate;
     private String electricitySupplyAddress;
     private Integer electricTypeId;
+    private Double longitude;
+    private Double latitude;
 }

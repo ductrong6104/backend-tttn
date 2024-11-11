@@ -52,6 +52,10 @@ public class Employee {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "IDTAIKHOAN")
     private Account account;
+    @Column(name = "KINHDO")
+    private Double longitude;
+    @Column(name = "VIDO")
+    private Double latitude;
     @JsonIgnore
     public String getIdAndFullName(){
         return id + "-" + firstName + " " + lastName;

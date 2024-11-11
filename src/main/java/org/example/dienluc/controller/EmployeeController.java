@@ -87,5 +87,14 @@ public class EmployeeController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<?> getEmployeeById(@PathVariable Integer employeeId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(employeeService.getEmployeeById(employeeId))
+                .message("get employee by id")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 
 }

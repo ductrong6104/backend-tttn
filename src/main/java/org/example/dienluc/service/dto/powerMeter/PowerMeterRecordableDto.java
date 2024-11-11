@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class PowerMeterRecordableDto {
     private Integer id;
     private String installationLocation;
-    private Double newIndex;
 }

@@ -105,4 +105,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return new ResponseCheck(false);
     }
+
+    @Override
+    public Employee getEmployeeById(Integer employeeId) {
+
+       Optional<Employee> employee = employeeRepository.findById(employeeId);
+       if (employee.isPresent())
+           return employee.get();
+       else
+           throw new EntityNotFoundException("Not found employee with id: " + employeeId);
+    }
 }

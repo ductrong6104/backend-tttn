@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PowerMeterGetDto {
-    private Integer id;
-    private String installationDate;
+public class UpdateCoordinatesDto {
+    private Integer idPowerMeter;
+    private Double longitude;
+    private Double latitude;
     private String installationLocation;
-    private Boolean powerMeterStatus;
-    private Float longitude;
-    private Float latitude;
 }

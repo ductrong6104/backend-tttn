@@ -5,14 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ElectricRecordingAssignedByEmployeeDto {
-    private Integer powerMeterId;
-    private String installationLocation;
-    private Double oldIndex;
-    private Double longitude;
-    private Double latitude;
+public class ElectricRecordingAutoAssign {
+    private Integer employeeId;
+    private List<Integer> powerMeterIds;
 }

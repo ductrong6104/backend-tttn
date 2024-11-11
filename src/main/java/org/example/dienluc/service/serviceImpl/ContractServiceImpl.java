@@ -50,6 +50,8 @@ public class ContractServiceImpl implements ContractService {
         PowerMeter newPowerMeter = powerMeterRepository.save(PowerMeter.builder()
                 .installationDate(currentDate)
                 .installationLocation(contractCreateDto.getElectricitySupplyAddress())
+                        .longitude(contractCreateDto.getLongitude())
+                        .latitude(contractCreateDto.getLatitude())
                 .build());
         Contract contract = modelMapper.map(contractCreateDto, Contract.class);
         contract.setPowerMeter(newPowerMeter);

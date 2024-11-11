@@ -1,7 +1,6 @@
 package org.example.dienluc.service.serviceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.catalina.mapper.Mapper;
 import org.example.dienluc.entity.ElectricRecording;
 import org.example.dienluc.entity.Employee;
 import org.example.dienluc.entity.PowerMeter;
@@ -10,16 +9,15 @@ import org.example.dienluc.repository.EmployeeRepository;
 import org.example.dienluc.repository.PowerMeterRepository;
 import org.example.dienluc.service.ElectricRecordingService;
 import org.example.dienluc.service.dto.electricRecording.*;
-import org.example.dienluc.service.dto.powerMeter.PowerMeterAvailableDto;
-import org.example.dienluc.service.dto.powerMeter.PowerMeterRecordableDto;
 import org.example.dienluc.service.dto.statistical.client.ElectricityUsedByClientDto;
-import org.example.dienluc.util.DateUtil;
 import org.example.dienluc.util.MapperUtil;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +27,8 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
     private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
     private final PowerMeterRepository powerMeterRepository;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     public ElectricRecordingServiceImpl(ElectricRecordingRepository electricRecordingRepository, ModelMapper modelMapper, EmployeeRepository employeeRepository, PowerMeterRepository powerMeterRepository) {
         this.electricRecordingRepository = electricRecordingRepository;
         this.modelMapper = modelMapper;
@@ -55,6 +54,8 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
                     ElectricRecordingAssignedDto electricRecordingAssignedDto = modelMapper.map(electricRecording, ElectricRecordingAssignedDto.class);
                     electricRecordingAssignedDto.setEmployeeNameAndId(electricRecording.getEmployee().getIdAndFullName());
                     electricRecordingAssignedDto.setInstallationLocation(electricRecording.getPowerMeter().getInstallationLocation());
+                    electricRecordingAssignedDto.setLongitude(electricRecording.getPowerMeter().getLongitude());
+                    electricRecordingAssignedDto.setLatitude(electricRecording.getPowerMeter().getLatitude());
                     return electricRecordingAssignedDto;
                 })
                 .collect(Collectors.toList());
@@ -63,7 +64,7 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
     @Override
     public List<ElectricRecordingAssignedByEmployeeDto> getAssignedElectricRecordingsByEmployeeId(Integer employeeId) {
         List<Object[]> results = electricRecordingRepository.getAssignedElectricRecordingsByEmployeeId(employeeId);
-        String[] fields = {"powerMeterId","installationLocation", "oldIndex" };
+        String[] fields = {"powerMeterId","installationLocation", "oldIndex", "longitude", "latitude" };
         return MapperUtil.mapResults(results, ElectricRecordingAssignedByEmployeeDto.class, fields);
     }
 
@@ -138,6 +139,34 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
 
         return "Xóa phân công thành công";
 
+    }
+
+    @Override
+    public List<ElectricRecordingHistoryByEmployeeDto> getRecordingHistoryByEmployee(Integer employeeId) {
+        List<Object[]> results = electricRecordingRepository.findByEmployeeIdOrderByRecordingDate(employeeId);
+        String[] fields = {"id", "powerMeterId", "recordingDate", "oldIndex", "newIndex"};
+        return MapperUtil.mapResults(results, ElectricRecordingHistoryByEmployeeDto.class, fields);
+    }
+
+    @Override
+    public String automationAssignment(List<ElectricRecordingAutoAssign> electricRecordingAutoAssign) {
+        List<Object[]> batchArgs = new ArrayList<>();
+
+        // Lặp qua danh sách dữ liệu
+        for (ElectricRecordingAutoAssign item : electricRecordingAutoAssign) {
+            Integer employeeId = item.getEmployeeId();
+            for (Integer powerMeterId : item.getPowerMeterIds()) {
+                // Thêm dữ liệu vào batchArgs dưới dạng mảng Object
+                batchArgs.add(new Object[] { employeeId, powerMeterId });
+            }
+        }
+
+        // Câu lệnh SQL để chèn dữ liệu vào bảng EmployeePowerMeters
+        String sql = "INSERT INTO GHIDIEN (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
+
+        // Thực hiện chèn hàng loạt
+        jdbcTemplate.batchUpdate(sql, batchArgs);
+        return "automation success";
     }
 
 }

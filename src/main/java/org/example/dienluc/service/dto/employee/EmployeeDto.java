@@ -1,5 +1,6 @@
 package org.example.dienluc.service.dto.employee;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +24,6 @@ public class EmployeeDto {
     private String username;
     private String password;
     private Integer roleId;
+    private Double longitude;
+    private Double latitude;
 }

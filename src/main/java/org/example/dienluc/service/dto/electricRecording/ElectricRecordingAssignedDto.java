@@ -15,5 +15,6 @@ public class ElectricRecordingAssignedDto {
     private String installationLocation;
     private String recordingDate;
     private String employeeNameAndId;
-
+    private Double longitude;
+    private Double latitude;
 }
