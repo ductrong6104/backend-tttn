@@ -1,8 +1,10 @@
 package org.example.dienluc.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.dienluc.entity.Assignment;
-import org.example.dienluc.entity.PowerMeter;
+import org.example.dienluc.mapper.Assignment;
+import org.example.dienluc.mapper.AssignmentDetail;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.PowerMeterService;
 import org.example.dienluc.service.dto.powerMeter.PowerMeterCreateDto;
@@ -85,26 +87,39 @@ public class PowerMeterController {
     public ResponseEntity<?> getAutomationAssignment() {
         // Chuyển đổi chuỗi thành Map
         String input = powerMeterService.getAutomationAssignment();
-        input = input.replace("'", "\""); // Thay đổi dấu nháy đơn thành dấu nháy kép để tạo thành JSON hợp lệ
+        input = input.replace("'", "\"") // Thay dấu nháy đơn thành dấu nháy kép
+                .replace("np.float64(", "") // Loại bỏ ký hiệu np.float64
+                .replace("np.int64(", "")
+                .replace(")", ""); // Loại bỏ dấu đóng ngoặc
         ObjectMapper objectMapper = new ObjectMapper();
         List<Assignment> assignments = new ArrayList<>();
         try {
-            Map<String, List<Integer>> map = objectMapper.readValue(input, Map.class);
+            // Parse JSON thành JsonNode
+            JsonNode rootNode = objectMapper.readTree(input);
 
+            // Lặp qua từng key trong JSON
+            rootNode.fields().forEachRemaining(entry -> {
+                String employeeId = entry.getKey();
+                JsonNode detailsNode = entry.getValue();
 
-            for (Map.Entry<String, List<Integer>> entry : map.entrySet()) {
-                assignments.add(new Assignment(entry.getKey(), entry.getValue()));
-            }
+                // Kiểm tra nếu là mảng rỗng
+                List<AssignmentDetail> details = new ArrayList<>();
+                if (detailsNode.isArray()) {
+                    for (JsonNode detailNode : detailsNode) {
+                        // Chuyển từng phần tử trong mảng thành AssignmentDetail
+                        AssignmentDetail detail = objectMapper.convertValue(detailNode, AssignmentDetail.class);
+                        details.add(detail);
+                    }
+                }
 
-            // In danh sách các đối tượng
-//            for (Assignment assignment : assignments) {
-//                System.out.println(assignment);
-//            }
-
+                // Thêm Assignment vào danh sách
+                assignments.add(new Assignment(employeeId, details));
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         ResponseData responseData = ResponseData.builder()
                 .data(assignments)
                 .message("get automation assignment")

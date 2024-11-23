@@ -1,4 +1,4 @@
-package org.example.dienluc.entity;
+package org.example.dienluc.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,5 +12,5 @@ import java.util.List;
 @Builder
 public class Assignment {
     private String employeeId;
-    private List<Integer> powerMeterIds;
+    private List<AssignmentDetail> powerMeters;
 }

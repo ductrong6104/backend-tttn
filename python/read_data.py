@@ -31,24 +31,28 @@ def read_data(query):
 
 
 # Tạo tọa độ ngẫu nhiên cho đồng hồ và nhân viên
+# dong_ho = read_data('''
+#     DECLARE @startDate DATE = DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE()), 0)
+# DECLARE @endDate DATE =  EOMONTH(GETDATE())
+# select id, VITRILAPDAT as installationLocation, KINHDO as longitude, VIDO as latitude from
+#     (SELECT ID, VITRILAPDAT, KINHDO, VIDO FROM DONGHODIEN where TRANGTHAI = 'true') dhd,
+#     (select IDDONGHODIEN = ISNULL(hd.IDDONGHODIEN, gd.IDDONGHODIEN), CHISOMOI = ISNULL(CHISOMOI, 0) from
+#         (select hd.IDDONGHODIEN from  HOPDONG hd WHERE hd.NGAYKTHD IS NULL AND hd.IDDONGHODIEN NOT IN
+#             (SELECT IDDONGHODIEN FROM GHIDIEN GROUP BY IDDONGHODIEN)) hd full outer join
+#                 (select IDDONGHODIEN, CHISOMOI from GHIDIEN WHERE IDDONGHODIEN NOT IN (SELECT IDDONGHODIEN FROM GHIDIEN WHERE NGAYGHICSD BETWEEN @startDate AND @endDate OR NGAYGHICSD IS NULL))
+#                 gd on hd.IDDONGHODIEN = gd.IDDONGHODIEN) gd WHERE dhd.id = gd.IDDONGHODIEN group by id, KINHDO, VIDO, VITRILAPDAT
+# ''')
 dong_ho = read_data('''
-    DECLARE @startDate DATE = DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE()), 0)
-DECLARE @endDate DATE =  EOMONTH(GETDATE())
-select ID, KINHDO, VIDO from 
-    (SELECT ID, KINHDO, VIDO FROM DONGHODIEN where TRANGTHAI = 'true') dhd, 
-    (select IDDONGHODIEN = ISNULL(hd.IDDONGHODIEN, gd.IDDONGHODIEN), CHISOMOI = ISNULL(CHISOMOI, 0) from 
-        (select hd.IDDONGHODIEN from  HOPDONG hd WHERE hd.NGAYKTHD IS NULL AND hd.IDDONGHODIEN NOT IN 
-            (SELECT IDDONGHODIEN FROM GHIDIEN GROUP BY IDDONGHODIEN)) hd full outer join
-                (select IDDONGHODIEN, CHISOMOI from GHIDIEN WHERE IDDONGHODIEN NOT IN (SELECT IDDONGHODIEN FROM GHIDIEN WHERE NGAYGHICSD BETWEEN @startDate AND @endDate OR NGAYGHICSD IS NULL)) 
-                gd on hd.IDDONGHODIEN = gd.IDDONGHODIEN) gd WHERE dhd.id = gd.IDDONGHODIEN group by id, KINHDO, VIDO
+    SELECT id, VITRILAPDAT AS installationLocation, KINHDO as longitude, VIDO as latitude FROM DONGHODIEN 
+    WHERE TRANGTHAI = 1 AND ID NOT IN (SELECT IDDONGHODIEN FROM GHIDIEN GROUP BY IDDONGHODIEN)
 ''')
 # tọa độ ngẫu nhiên trong một khu vực 100x100
 nhan_vien = read_data('''
 SELECT ID, HOTEN = HO + ' ' + TEN, KINHDO, VIDO FROM NHANVIEN WHERE IDTAIKHOAN IN (SELECT ID FROM TAIKHOAN WHERE IDQUYEN = 2)
 '''
                       )
-
-dong_ho_coords = dong_ho.drop(columns=['ID']).to_numpy()
+# chi lay ra cot kinh do, vi do de thuc hien tinh toan khoang cach haversine
+dong_ho_coords = dong_ho.drop(columns=['id', 'installationLocation']).to_numpy()
 nhan_vien_coords = nhan_vien.drop(  columns=['ID', 'HOTEN']).to_numpy()
 
 number_power_meter = len(dong_ho_coords)
@@ -71,13 +75,13 @@ labels, centroids = kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_cluster
 #     print("Các đồng hồ đã được phân bố đều trong các cụm.")
 # else:
 #     print("Sự phân bố của các đồng hồ trong các cụm chưa đều.")
-assignments = {}
+assignments = assignments = {f"{row['ID']}-{row['HOTEN']}": [] for _, row in nhan_vien.iterrows()}
 for i in range(number_power_meter):
-    dong_ho_id = int(dong_ho.iloc[i]['ID'])
+    dong_ho_id = dict(dong_ho.iloc[i])
     id_hotennv = str(nhan_vien.iloc[int(labels[i])]['ID']) + '-' + nhan_vien.iloc[int(labels[i])]['HOTEN']
     # Kiểm tra nếu dong_ho_id chưa có trong assignments, khởi tạo list rỗng
-    if f"{id_hotennv}" not in assignments:
-        assignments[f"{id_hotennv}"] = []
+    # if f"{id_hotennv}" not in assignments:
+    #     assignments[f"{id_hotennv}"] = []
 
     # Thêm phần tử mới vào danh sách của dong_ho_id
     assignments[f"{id_hotennv}"].append(dong_ho_id)  # 'new_value' là cột bạn muốn thêm

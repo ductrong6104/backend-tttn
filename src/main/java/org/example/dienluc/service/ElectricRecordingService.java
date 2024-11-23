@@ -31,4 +31,6 @@ public interface ElectricRecordingService {
     public List<ElectricRecordingHistoryByEmployeeDto> getRecordingHistoryByEmployee(Integer employeeId);
 
     public String automationAssignment(List<ElectricRecordingAutoAssign> electricRecordingAutoAssign);
+
+    public String createAutomationAssignmentOneEmployee(ElectricRecordingAutoAssign electricRecordingAutoAssign);
 }

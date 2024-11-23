@@ -42,10 +42,5 @@ public class ElectricRecording {
 
     @Column(name = "CHISOCU")
     private Double oldIndex;
-    @PrePersist
-    protected void onCreate(){
-        recordingDate = null;
-        newIndex = null;
-        oldIndex = null;
-    }
+
 }

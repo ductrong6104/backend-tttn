@@ -1,13 +1,11 @@
 package org.example.dienluc.controller;
 
-import org.example.dienluc.entity.ElectricRecording;
 import org.example.dienluc.entity.Graph;
 import org.example.dienluc.entity.Location;
-import org.example.dienluc.entity.LocationDistance;
+import org.example.dienluc.mapper.LocationDistance;
 import org.example.dienluc.payload.ResponseData;
 import org.example.dienluc.service.ElectricRecordingService;
 import org.example.dienluc.service.dto.electricRecording.*;
-import org.example.dienluc.service.dto.electricType.ElectricTypeCreateDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -176,6 +174,16 @@ public class ElectricRecordingController {
         ResponseData responseData = ResponseData.builder()
                 .data(electricRecordingService.automationAssignment(electricRecordingAutoAssign))
                 .message("create electric recording automation assignment")
+                .status(HttpStatus.CREATED.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
+
+    @PostMapping("/automation-assignment-one-employee")
+    public ResponseEntity<?> createAutomationAssignmentOneEmployee(@RequestBody ElectricRecordingAutoAssign electricRecordingAutoAssign) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.createAutomationAssignmentOneEmployee(electricRecordingAutoAssign))
+                .message("create electric recording automation assignment one employee")
                 .status(HttpStatus.CREATED.value())
                 .build();
         return ResponseEntity.ok(responseData);

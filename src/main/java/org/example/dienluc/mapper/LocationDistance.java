@@ -1,4 +1,4 @@
-package org.example.dienluc.entity;
+package org.example.dienluc.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

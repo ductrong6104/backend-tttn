@@ -70,13 +70,13 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
 
     @Override
     public ElectricRecording updateElectricRecordingFirst(ElectricRecordingCreateDto electricRecordingCreateDto) {
-        System.out.println(electricRecordingCreateDto);
-        ElectricRecording electricRecording = electricRecordingRepository.findNotAssignedByPowerMeterIdAndEmployeeIdAndRecordingDate(electricRecordingCreateDto.getPowerMeterId(), electricRecordingCreateDto.getEmployeeId())
-                        .orElseThrow(() -> new EntityNotFoundException("ElectricRecording to update first not found"));
-        electricRecording.setOldIndex(electricRecordingCreateDto.getOldIndex());
-        electricRecording.setNewIndex(electricRecordingCreateDto.getNewIndex());
-        electricRecording.setRecordingDate(electricRecordingCreateDto.getRecordingDate());
-        return electricRecordingRepository.save(electricRecording);
+//        ElectricRecording electricRecording = electricRecordingRepository.findNotAssignedByPowerMeterIdAndEmployeeIdAndRecordingDate(electricRecordingCreateDto.getPowerMeterId(), electricRecordingCreateDto.getEmployeeId())
+//                        .orElseThrow(() -> new EntityNotFoundException("ElectricRecording to update first not found"));
+//        electricRecording.setOldIndex(electricRecordingCreateDto.getOldIndex());
+//        electricRecording.setNewIndex(electricRecordingCreateDto.getNewIndex());
+//        electricRecording.setRecordingDate(electricRecordingCreateDto.getRecordingDate());
+
+        return electricRecordingRepository.save(modelMapper.map(electricRecordingCreateDto, ElectricRecording.class));
 
 
     }
@@ -132,10 +132,10 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
     public String deleteRecordingByEmployee(Integer electricRecordingId) {
         ElectricRecording electricRecording = electricRecordingRepository.findById(electricRecordingId)
                 .orElseThrow(() -> new EntityNotFoundException("ElectricRecording not found with id: " + electricRecordingId));
-        electricRecording.setRecordingDate(null);
-        electricRecording.setOldIndex(null);
-        electricRecording.setNewIndex(null);
-        electricRecordingRepository.save(electricRecording);
+//        electricRecording.setRecordingDate(null);
+//        electricRecording.setOldIndex(null);
+//        electricRecording.setNewIndex(null);
+        electricRecordingRepository.deleteById(electricRecordingId);
 
         return "Xóa phân công thành công";
 
@@ -167,6 +167,25 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
         // Thực hiện chèn hàng loạt
         jdbcTemplate.batchUpdate(sql, batchArgs);
         return "automation success";
+    }
+
+    @Override
+    public String createAutomationAssignmentOneEmployee(ElectricRecordingAutoAssign electricRecordingAutoAssign) {
+        List<Object[]> batchArgs = new ArrayList<>();
+
+        Integer employeeId = electricRecordingAutoAssign.getEmployeeId();
+        for (Integer powerMeterId : electricRecordingAutoAssign.getPowerMeterIds()) {
+            // Thêm dữ liệu vào batchArgs dưới dạng mảng Object
+            batchArgs.add(new Object[] { employeeId, powerMeterId });
+        }
+
+
+        // Câu lệnh SQL để chèn dữ liệu vào bảng EmployeePowerMeters
+        String sql = "INSERT INTO GHIDIEN (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
+
+        // Thực hiện chèn hàng loạt
+        jdbcTemplate.batchUpdate(sql, batchArgs);
+        return "automation assign for one employee success";
     }
 
 }
