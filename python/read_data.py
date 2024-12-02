@@ -44,7 +44,7 @@ def read_data(query):
 # ''')
 dong_ho = read_data('''
     SELECT id, VITRILAPDAT AS installationLocation, KINHDO as longitude, VIDO as latitude FROM DONGHODIEN 
-    WHERE TRANGTHAI = 1 AND ID NOT IN (SELECT IDDONGHODIEN FROM GHIDIEN GROUP BY IDDONGHODIEN)
+    WHERE TRANGTHAI = 1 AND ID NOT IN (SELECT IDDONGHODIEN FROM PHANCONG)
 ''')
 # tọa độ ngẫu nhiên trong một khu vực 100x100
 nhan_vien = read_data('''

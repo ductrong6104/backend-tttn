@@ -40,6 +40,7 @@ public class ElectricRecordingController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
     @GetMapping("/assigned/{employeeId}")
     public ResponseEntity<?> getAssignedElectricRecordingsByEmployeeId(@PathVariable Integer employeeId) {
         ResponseData responseData = ResponseData.builder()
@@ -188,5 +189,13 @@ public class ElectricRecordingController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
-
+    @GetMapping("recording-history/powerMeter/{powerMeterId}")
+    public ResponseEntity<?> getRecordingHistoryByPowerMeter(@PathVariable Integer powerMeterId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.getRecordingHistoryByPowerMeter(powerMeterId))
+                .message("get recording history by powerMeter")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 }

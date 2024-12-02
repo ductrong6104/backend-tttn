@@ -4,22 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import org.example.dienluc.util.DateUtil;
-
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "GHIDIEN")
+@Table(name = "PHANCONG")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class ElectricRecording {
+public class AssignmentModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
@@ -35,20 +32,5 @@ public class ElectricRecording {
     @JoinColumn(name = "IDDONGHODIEN", nullable = false)
     private PowerMeter powerMeter;
 
-    @Column(name = "NGAYGHICSD", nullable = false)
-    private String recordingDate;
 
-    @Column(name = "CHISOMOI")
-    private Double newIndex;
-
-    @Column(name = "CHISOCU")
-    private Double oldIndex;
-    @PrePersist
-    protected void onCreate(){
-        if (recordingDate == null){
-            recordingDate = DateUtil.formatDateForDatabase(LocalDate.now());
-            newIndex = (double) 0;
-            oldIndex = (double) 0;
-        }
-    }
 }

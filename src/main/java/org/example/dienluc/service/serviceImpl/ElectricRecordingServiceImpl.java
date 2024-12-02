@@ -9,7 +9,9 @@ import org.example.dienluc.repository.EmployeeRepository;
 import org.example.dienluc.repository.PowerMeterRepository;
 import org.example.dienluc.service.ElectricRecordingService;
 import org.example.dienluc.service.dto.electricRecording.*;
+import org.example.dienluc.service.dto.powerMeter.ElectricRecordingHistoryByPowerMeterDto;
 import org.example.dienluc.service.dto.statistical.client.ElectricityUsedByClientDto;
+import org.example.dienluc.util.DateUtil;
 import org.example.dienluc.util.MapperUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -162,7 +165,7 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
         }
 
         // Câu lệnh SQL để chèn dữ liệu vào bảng EmployeePowerMeters
-        String sql = "INSERT INTO GHIDIEN (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
+        String sql = "INSERT INTO PHANCONG (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
 
         // Thực hiện chèn hàng loạt
         jdbcTemplate.batchUpdate(sql, batchArgs);
@@ -176,16 +179,23 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
         Integer employeeId = electricRecordingAutoAssign.getEmployeeId();
         for (Integer powerMeterId : electricRecordingAutoAssign.getPowerMeterIds()) {
             // Thêm dữ liệu vào batchArgs dưới dạng mảng Object
-            batchArgs.add(new Object[] { employeeId, powerMeterId });
+            batchArgs.add(new Object[] { employeeId, powerMeterId});
         }
 
 
         // Câu lệnh SQL để chèn dữ liệu vào bảng EmployeePowerMeters
-        String sql = "INSERT INTO GHIDIEN (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
+        String sql = "INSERT INTO PHANCONG (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
 
         // Thực hiện chèn hàng loạt
         jdbcTemplate.batchUpdate(sql, batchArgs);
         return "automation assign for one employee success";
+    }
+
+    @Override
+    public List<ElectricRecordingHistoryByPowerMeterDto> getRecordingHistoryByPowerMeter(Integer powerMeterId) {
+        List<Object[]> results = electricRecordingRepository.findByPowerMeterIdOrderByRecordingDate(powerMeterId);
+        String[] fields = {"id", "powerMeterId", "recordingDate", "oldIndex", "newIndex"};
+        return MapperUtil.mapResults(results, ElectricRecordingHistoryByPowerMeterDto.class, fields);
     }
 
 }

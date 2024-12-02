@@ -2,6 +2,7 @@ package org.example.dienluc.service;
 
 import org.example.dienluc.entity.ElectricRecording;
 import org.example.dienluc.service.dto.electricRecording.*;
+import org.example.dienluc.service.dto.powerMeter.ElectricRecordingHistoryByPowerMeterDto;
 import org.example.dienluc.service.dto.statistical.client.ElectricityUsedByClientDto;
 
 import java.util.List;
@@ -33,4 +34,6 @@ public interface ElectricRecordingService {
     public String automationAssignment(List<ElectricRecordingAutoAssign> electricRecordingAutoAssign);
 
     public String createAutomationAssignmentOneEmployee(ElectricRecordingAutoAssign electricRecordingAutoAssign);
+
+    public List<ElectricRecordingHistoryByPowerMeterDto> getRecordingHistoryByPowerMeter(Integer powerMeterId);
 }

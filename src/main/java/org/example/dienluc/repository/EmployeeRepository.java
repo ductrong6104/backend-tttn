@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
-    @Query("select e from Employee e where e.account.role.id = ?1")
+    @Query("select e from Employee e where e.account.role.id = ?1 and e.resignation = false")
     List<Employee> findByRoleId(Integer roleId);
 
     Optional<Employee> findByEmail(String email);

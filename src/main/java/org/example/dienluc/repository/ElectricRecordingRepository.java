@@ -72,4 +72,6 @@ public interface ElectricRecordingRepository extends JpaRepository<ElectricRecor
 
     @Query("Select er.id, er.powerMeter.id as powerMeterId, er.recordingDate, er.oldIndex, er.newIndex from ElectricRecording er where er.employee.id = ?1 and er.recordingDate IS NOT NULL ORDER BY er.recordingDate DESC")
     List<Object[]> findByEmployeeIdOrderByRecordingDate(Integer employeeId);
+    @Query("Select er.id, er.powerMeter.id as powerMeterId, er.recordingDate, er.oldIndex, er.newIndex from ElectricRecording er where er.powerMeter.id = ?1 and er.recordingDate IS NOT NULL ORDER BY er.recordingDate DESC")
+    List<Object[]> findByPowerMeterIdOrderByRecordingDate(Integer powerMeterId);
 }
