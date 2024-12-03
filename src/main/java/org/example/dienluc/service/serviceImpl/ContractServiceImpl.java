@@ -148,7 +148,8 @@ public class ContractServiceImpl implements ContractService {
         else{
             Integer employeeId = electricRecordingRecentDtos.get(0).getEmployeeId();
             Integer powerMeterId = electricRecordingRecentDtos.get(0).getPowerMeterId();
-
+            contract.setContractStatus(ContractStatus.builder().id(2).build());
+//            System.out.println(contract);
             contractRepository.save(contract);
             System.out.println("employeeId" + employeeId);
             System.out.println("powerMeterId" + powerMeterId);

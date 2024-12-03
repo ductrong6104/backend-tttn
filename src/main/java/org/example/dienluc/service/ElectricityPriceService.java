@@ -12,5 +12,6 @@ public interface ElectricityPriceService {
 
     public ElectricityPrice createElectricityPrice(ElectricityPriceCreateDto electricityPriceCreateDto);
 
-    public String deleteElectricityPrice(ElectricityPriceDeleteDto electricityPriceDeleteDto);
+    public String deleteElectricityPrice(Integer electricTypeId, Integer levelId);
+
 }

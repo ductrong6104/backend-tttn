@@ -52,17 +52,17 @@ public class ElectricityPriceServiceImpl implements ElectricityPriceService {
     }
     @Transactional
     @Override
-    public String deleteElectricityPrice(ElectricityPriceDeleteDto electricityPriceDeleteDto) {
-        ElectricType electricType = electricTypeRepository.findById(electricityPriceDeleteDto.getElectricTypeId())
-                        .orElseThrow(() -> new EntityNotFoundException("ElectricType not found with id: " + electricityPriceDeleteDto.getElectricTypeId()));
-        Level level = levelRepository.findById(electricityPriceDeleteDto.getLevelId())
-                        .orElseThrow(() -> new EntityNotFoundException("Level not found with id: " + electricityPriceDeleteDto.getLevelId()));
+    public String deleteElectricityPrice(Integer electricTypeId, Integer levelId) {
+        ElectricType electricType = electricTypeRepository.findById(electricTypeId)
+                        .orElseThrow(() -> new EntityNotFoundException("ElectricType not found with id: " + electricTypeId));
+        Level level = levelRepository.findById(levelId)
+                        .orElseThrow(() -> new EntityNotFoundException("Level not found with id: " + levelId));
         int deletedCount = electricityPriceRepository.deleteByElectricTypeAndLevel(electricType, level);
         // deltedCount: số bản ghi được xóa
         if (deletedCount > 0) {
             return "Xóa giá điện thành công";
         } else {
-            throw new EntityNotFoundException("No ElectricityPrice found for ElectricType id: " + electricityPriceDeleteDto.getElectricTypeId() + " and Level id: " + electricityPriceDeleteDto.getLevelId());
+            throw new EntityNotFoundException("No ElectricityPrice found for ElectricType id: " + electricTypeId + " and Level id: " + levelId);
         }
     }
 }

@@ -35,10 +35,10 @@ public class ElectricityPriceController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
-    @DeleteMapping("")
-    public ResponseEntity<?> deleteElectricityPrice(@RequestBody ElectricityPriceDeleteDto electricityPriceDeleteDto) {
+    @DeleteMapping("/electric-types/{electricTypeId}/levels/{levelId}")
+    public ResponseEntity<?> deleteElectricityPrice(@PathVariable Integer electricTypeId, @PathVariable Integer levelId) {
         ResponseData responseData = ResponseData.builder()
-                .data(electricityPriceService.deleteElectricityPrice(electricityPriceDeleteDto))
+                .data(electricityPriceService.deleteElectricityPrice(electricTypeId, levelId))
                 .message("delete electric price")
                 .status(HttpStatus.NO_CONTENT.value())
                 .build();
