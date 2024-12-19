@@ -3,7 +3,7 @@ import pyodbc
 import pandas as pd
 # import json
 from cluster_haversine import kmeans_haversine, visualize_cluster_distribution, compute_cluster_distribution, \
-    is_distribution_even
+    is_distribution_even, plotSilhouetteScore, plotWCSS
 
 import sys
 import io
@@ -62,7 +62,7 @@ number_employee = len(nhan_vien_coords)
 #     print(nhan_vien_coords)
 #
 # # Phân cụm đồng hồ bằng khoảng cách Haversine
-labels, centroids = kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_clusters=number_employee,
+labels, centroids, wcss_values, silhouette_scores = kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_clusters=number_employee,
                                      max_iterations=10)
 #     print(f"results of labels: {labels}")
 #     print(f"result of centroids: {centroids}")
@@ -101,4 +101,5 @@ cursor.close()
 conn.close()
 print(assignments)
 
-
+# plotSilhouetteScore(silhouette_scores)
+# plotWCSS(wcss_values)

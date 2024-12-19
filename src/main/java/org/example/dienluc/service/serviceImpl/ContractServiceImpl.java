@@ -233,4 +233,17 @@ public class ContractServiceImpl implements ContractService {
         clientRepository.save(client);
         return contractRepository.save(contract);
     }
+
+    @Override
+    public List<RegistrationFormGetDto> getRegistrationFormByClientId(Integer clientId) {
+        List<RegistrationFormGetDto> registrationFormDtos = new ArrayList<>();
+        contractRepository.findByClientId(clientId).forEach((contract) -> {
+            RegistrationFormGetDto registrationFormDto = modelMapper.map(contract, RegistrationFormGetDto.class);
+            registrationFormDto.setIdAndFullName(contract.getClient().getIdAndFullName());
+            registrationFormDto.setElectricitySupplyAddress(contract.getPowerMeter().getIdAndInstallationLocation());
+            registrationFormDto.setNameStatus(contract.getContractStatus().getName());
+            registrationFormDtos.add(registrationFormDto);
+        });
+        return registrationFormDtos;
+    }
 }

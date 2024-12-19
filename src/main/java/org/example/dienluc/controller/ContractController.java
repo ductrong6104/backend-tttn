@@ -114,6 +114,14 @@ public class ContractController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
-
+    @GetMapping("/client/{clientId}/registration-form")
+        public ResponseEntity<?> getRegistrationFormByClientId(@PathVariable Integer clientId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(contractService.getRegistrationFormByClientId(clientId))
+                .message("get registration forms by client id")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 
 }

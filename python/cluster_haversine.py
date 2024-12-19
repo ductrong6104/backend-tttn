@@ -34,6 +34,8 @@ def kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_clusters, max_iteration
     centroids = nhan_vien_coords.copy()
     labels = np.zeros(dong_ho_coords.shape[0])
 #     print(f"labels {labels}")
+    wcss_values = []
+    silhouette_scores = []
 
     for j in range(max_iterations):
         # Bước 1: Gán từng đồng hồ vào cụm gần nhất
@@ -48,6 +50,13 @@ def kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_clusters, max_iteration
             labels[i] = np.argmin(distances)
             # print(f"labels: {labels}")
 
+        # Tính WCSS sau mỗi lần cập nhật
+        wcss = calculate_wcss_haversine(dong_ho_coords, centroids, labels)
+        wcss_values.append(wcss)
+
+        # Tính Silhouette Score sau mỗi lần cập nhật
+        avg_silhouette_score, _ = silhouette_score_haversine(dong_ho_coords, labels, centroids)
+        silhouette_scores.append(avg_silhouette_score)
 
         # Bước 2: Cập nhật vị trí trung tâm cụm
         new_centroids = []
@@ -65,7 +74,7 @@ def kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_clusters, max_iteration
 
         centroids = np.array(new_centroids)
 
-    return labels, centroids
+    return labels, centroids, wcss_values, silhouette_scores
 
 def plot_cluster(dong_ho_coords, nhan_vien_coords, labels, centroids):
     plt.figure(figsize=(10, 10))
@@ -111,7 +120,69 @@ def is_distribution_even(sizes):
     print(f"Kích thước trung bình của các cụm: {mean_size}")
     print(f"Độ lệch chuẩn: {std_dev}")
     return std_dev < 1  # Có thể điều chỉnh ngưỡng này
+def calculate_wcss_haversine(dong_ho_coords, centroids, labels):
+    """
+    Tính toán Within-Cluster Sum of Squares (WCSS) cho KMeans sử dụng khoảng cách Haversine.
+    """
+    wcss = 0
+    for i, centroid in enumerate(centroids):
+        # Lấy tất cả điểm trong cụm `i`
+        points_in_cluster = dong_ho_coords[labels == i]
+        # Tính tổng bình phương khoảng cách từ các điểm đến tâm cụm
+        for point in points_in_cluster:
+            wcss += haversine(point, centroid) ** 2
+    return wcss
 
+def silhouette_score_haversine(dong_ho_coords, labels, centroids):
+    """
+    Tính Silhouette Score cho từng điểm và trung bình của toàn bộ dataset.
+    """
+    n_points = dong_ho_coords.shape[0]
+    silhouette_scores = []
+
+    for i, point in enumerate(dong_ho_coords):
+        # Nhãn cụm của điểm hiện tại
+        cluster_label = int(labels[i])
+
+        # Các điểm trong cùng cụm
+        same_cluster_points = dong_ho_coords[labels == cluster_label]
+
+        # Tính khoảng cách trung bình đến các điểm trong cùng cụm (a)
+        if len(same_cluster_points) > 1:
+            a = np.mean([haversine(point, other) for other in same_cluster_points if not np.array_equal(point, other)])
+        else:
+            a = 0  # Nếu chỉ có một điểm, khoảng cách trung bình là 0
+
+        # Tính khoảng cách trung bình đến các cụm khác (b)
+        b = float('inf')
+        for j, centroid in enumerate(centroids):
+            if j != cluster_label:
+                other_cluster_points = dong_ho_coords[labels == j]
+                if len(other_cluster_points) > 0:
+                    avg_dist_to_other_cluster = np.mean([haversine(point, other) for other in other_cluster_points])
+                    b = min(b, avg_dist_to_other_cluster)
+
+        # Tính Silhouette Score cho điểm hiện tại
+        s = (b - a) / max(a, b) if max(a, b) > 0 else 0
+        silhouette_scores.append(s)
+
+    # Tính Silhouette Score trung bình
+    avg_silhouette_score = np.mean(silhouette_scores)
+    return avg_silhouette_score, silhouette_scores
+def plotWCSS(wcss_values):
+    plt.plot(range(len(wcss_values)), wcss_values, marker='o')
+    plt.title('WCSS vs Iterations')
+    plt.xlabel('Iterations')
+    plt.ylabel('WCSS')
+    plt.show()
+
+def plotSilhouetteScore(silhouette_scores):
+    plt.plot(range(len(silhouette_scores)), silhouette_scores, marker='o', label='Silhouette Score')
+    plt.title('Silhouette Score vs Iterations')
+    plt.xlabel('Iterations')
+    plt.ylabel('Silhouette Score')
+    plt.legend()
+    plt.show()
 if __name__ == "__main__":
     # Số lượng đồng hồ và nhân viên
     np.random.seed(0)

@@ -28,4 +28,6 @@ public interface ContractService {
     public String cancelRegisterByClientId(Integer clientId);
 
     public Contract updateInforForReject(Integer contractId, Integer clientId, ClientUpdateReasonRejectDto clientUpdateReasonRejectDto);
+
+    public List<RegistrationFormGetDto> getRegistrationFormByClientId(Integer clientId);
 }

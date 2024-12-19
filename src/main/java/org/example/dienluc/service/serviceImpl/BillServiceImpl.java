@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.example.dienluc.entity.Bill;
 import org.example.dienluc.entity.Client;
 import org.example.dienluc.entity.ElectricityPrice;
+import org.example.dienluc.entity.PowerMeter;
 import org.example.dienluc.repository.*;
 import org.example.dienluc.service.BillService;
 import org.example.dienluc.service.dto.bill.*;
@@ -35,15 +36,17 @@ public class BillServiceImpl implements BillService {
     private final ElectricityPriceRepository electricityPriceRepository;
     private final ElectricRecordingRepository electricRecordingRepository;
     private final ContractRepository contractRepository;
+    private final PowerMeterRepository powerMeterRepository;
 
 
-    public BillServiceImpl(BillRepository billRepository, ModelMapper modelMapper, ModelMapper modelMapper1, ClientRepository clientRepository, ElectricityPriceRepository electricityPriceRepository, ElectricRecordingRepository electricRecordingRepository, ContractRepository contractRepository) {
+    public BillServiceImpl(BillRepository billRepository, ModelMapper modelMapper, ModelMapper modelMapper1, ClientRepository clientRepository, ElectricityPriceRepository electricityPriceRepository, ElectricRecordingRepository electricRecordingRepository, ContractRepository contractRepository, PowerMeterRepository powerMeterRepository) {
         this.billRepository = billRepository;
         this.modelMapper = modelMapper1;
         this.clientRepository = clientRepository;
         this.electricityPriceRepository = electricityPriceRepository;
         this.electricRecordingRepository = electricRecordingRepository;
         this.contractRepository = contractRepository;
+        this.powerMeterRepository = powerMeterRepository;
     }
     @Transactional
     @Override
@@ -90,6 +93,7 @@ public class BillServiceImpl implements BillService {
                 .orElseThrow(() -> new EntityNotFoundException("Client not found with id: " + clientId));
         Bill bill = billRepository.findById(billId)
                 .orElseThrow(() -> new EntityNotFoundException("Bill not found with id: " + billId));
+
 //        System.out.println("client: " + client.toString());
         billGeneratePdfDto = modelMapper.map(client, BillGeneratePdfDto.class);
         billGeneratePdfDto = modelMapper.map(bill, BillGeneratePdfDto.class);
@@ -97,7 +101,7 @@ public class BillServiceImpl implements BillService {
         billGeneratePdfDto.setEmail(client.getEmail());
         billGeneratePdfDto.setAddress(client.getAddress());
         billGeneratePdfDto.setPhone(client.getPhone());
-        billGeneratePdfDto.setElectricitySupplyAddress(client.getContracts().get(0).getPowerMeter().getInstallationLocation());
+        billGeneratePdfDto.setElectricitySupplyAddress(bill.getElectricRecording().getPowerMeter().getInstallationLocation());
         billGeneratePdfDto.setElectricTypeName(client.getContracts().get(0).getElectricType().getName());
         billGeneratePdfDto.setOldIndex(bill.getElectricRecording().getOldIndex());
         billGeneratePdfDto.setNewIndex(bill.getElectricRecording().getNewIndex());
@@ -163,7 +167,7 @@ public class BillServiceImpl implements BillService {
             billGeneratePdfPaymentDto.setPrice(electricPriceGetPriceDtos.get(0).getPrice().toString());
 //        System.out.println("client: " + client.toString());
         billGeneratePdfPaymentDto.setFullName(client.getFullName());
-        billGeneratePdfPaymentDto.setAddress(client.getAddress());
+        billGeneratePdfPaymentDto.setAddress(bill.getElectricRecording().getPowerMeter().getInstallationLocation());
         billGeneratePdfPaymentDto.setConsumption(electricUsed.toString());
         billGeneratePdfPaymentDto.setToDate(bill.getElectricRecording().getRecordingDate());
 
