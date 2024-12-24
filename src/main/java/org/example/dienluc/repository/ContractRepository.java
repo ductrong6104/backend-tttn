@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface ContractRepository extends JpaRepository<Contract, Integer> {
     public Contract findByClientAndEndDate(Client client, String endDate);
-    public List<Contract> findByPowerMeter(PowerMeter powerMeter);
+
     public List<Contract> findByProcessingEmployeeIsNull();
     public List<Contract> findByProcessingEmployeeIsNotNull();
     @Query(value = "select LD.TENLOAIDIEN as electricTypeName, SUM(CHISOMOI-CHISOCU) as consumption from GHIDIEN GD,\n" +
@@ -28,5 +28,6 @@ public interface ContractRepository extends JpaRepository<Contract, Integer> {
     Contract findByClientIdAndStatusId(Integer clientId, Integer statusId);
     @Query(value = "select NGAYBDHD from HOPDONG where IDDONGHODIEN = ?1", nativeQuery = true)
     public String getStartDateByMeterId(Integer powerMeterId);
+
 
 }

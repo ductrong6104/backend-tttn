@@ -1,15 +1,13 @@
 package org.example.dienluc.service.serviceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.dienluc.entity.Bill;
-import org.example.dienluc.entity.Client;
-import org.example.dienluc.entity.ElectricityPrice;
-import org.example.dienluc.entity.PowerMeter;
+import org.example.dienluc.entity.*;
 import org.example.dienluc.repository.*;
 import org.example.dienluc.service.BillService;
 import org.example.dienluc.service.dto.bill.*;
 import org.example.dienluc.service.dto.electricRecording.ElectricRecordingFromDateGetDto;
 import org.example.dienluc.service.dto.electricityPrice.ElectricPriceGetPriceDto;
+import org.example.dienluc.service.dto.level.LevelGetByElectricRecordingDto;
 import org.example.dienluc.service.dto.powerMeter.PowerMeterRecordableDto;
 import org.example.dienluc.util.DateUtil;
 import org.example.dienluc.util.MapperUtil;
@@ -37,9 +35,9 @@ public class BillServiceImpl implements BillService {
     private final ElectricRecordingRepository electricRecordingRepository;
     private final ContractRepository contractRepository;
     private final PowerMeterRepository powerMeterRepository;
+    private final LevelRepository levelRepository;
 
-
-    public BillServiceImpl(BillRepository billRepository, ModelMapper modelMapper, ModelMapper modelMapper1, ClientRepository clientRepository, ElectricityPriceRepository electricityPriceRepository, ElectricRecordingRepository electricRecordingRepository, ContractRepository contractRepository, PowerMeterRepository powerMeterRepository) {
+    public BillServiceImpl(BillRepository billRepository, ModelMapper modelMapper, ModelMapper modelMapper1, ClientRepository clientRepository, ElectricityPriceRepository electricityPriceRepository, ElectricRecordingRepository electricRecordingRepository, ContractRepository contractRepository, PowerMeterRepository powerMeterRepository, LevelRepository levelRepository) {
         this.billRepository = billRepository;
         this.modelMapper = modelMapper1;
         this.clientRepository = clientRepository;
@@ -47,13 +45,68 @@ public class BillServiceImpl implements BillService {
         this.electricRecordingRepository = electricRecordingRepository;
         this.contractRepository = contractRepository;
         this.powerMeterRepository = powerMeterRepository;
+        this.levelRepository = levelRepository;
     }
     @Transactional
     @Override
     public TotalAmountResponse getTotalAmountByElectricRecordingId(Integer electricRecordingId) {
-        List<Object[]> results = billRepository.getTotalAmountByElectricRecordingId(electricRecordingId);
-        String[] fields = {"totalAmount"};
-        return MapperUtil.mapResults(results, TotalAmountResponse.class, fields).get(0);
+//        List<Object[]> results = billRepository.getTotalAmountByElectricRecordingId(electricRecordingId);
+//        String[] fields = {"totalAmount"};
+        List<Object[]> results = levelRepository.findByElectricRecordingId(electricRecordingId);
+        String[] fields = {"oldIndex", "newIndex", "price"};
+        List<LevelGetByElectricRecordingDto> levelGetByElectricRecordingDtos = MapperUtil.mapResults(results, LevelGetByElectricRecordingDto.class, fields);
+        ElectricRecording electricRecording = electricRecordingRepository.findById(electricRecordingId)
+                .orElseThrow(() -> new EntityNotFoundException("Electric Recording not found with id: " + electricRecordingId));
+
+        BigDecimal totalAmount = BigDecimal.ZERO; // Khởi tạo totalAmount
+        BigDecimal powerConsumption = BigDecimal.valueOf(electricRecording.getPowerConsumption()); // Khởi tạo từ chỉ số mới
+        System.out.println("powerConsumption" + powerConsumption);
+        for (LevelGetByElectricRecordingDto levelGetByElectricRecordingDto : levelGetByElectricRecordingDtos) {
+
+            if (levelGetByElectricRecordingDto.getNewIndex() != null) {
+                BigDecimal newIndex = BigDecimal.valueOf(levelGetByElectricRecordingDto.getNewIndex());
+                BigDecimal oldIndex = BigDecimal.valueOf(levelGetByElectricRecordingDto.getOldIndex());
+                BigDecimal price = levelGetByElectricRecordingDto.getPrice();
+
+                // Tính mức tiêu thụ
+                BigDecimal powerConsumptionChange = powerConsumption.subtract(newIndex.subtract(oldIndex).add(BigDecimal.valueOf(1)));
+                System.out.println("powerConsumptionChange " + powerConsumptionChange);
+                if (powerConsumptionChange.compareTo(BigDecimal.ZERO) > 0) {
+                    // Nếu còn dư mức tiêu thụ
+                    totalAmount = totalAmount.add(
+                            newIndex.subtract(oldIndex).add(BigDecimal.valueOf(1)).multiply(price)
+                    );
+                }
+                else if (powerConsumptionChange.compareTo(BigDecimal.ZERO) == 0){
+                    totalAmount = totalAmount.add(
+                            newIndex.subtract(oldIndex).add(BigDecimal.valueOf(1)).multiply(price)
+                    );
+                    break;
+                } else {
+                    // Nếu vượt ngưỡng tiêu thụ
+                    totalAmount = totalAmount.add(
+                        powerConsumption.multiply(price)
+                    );
+                    break;
+                }
+                powerConsumption = powerConsumptionChange;
+            } else {
+                // Trường hợp không có newIndex
+                BigDecimal price = levelGetByElectricRecordingDto.getPrice();
+                System.out.println("khonh co new index" + powerConsumption);
+                // Tính mức tiêu thụ
+                totalAmount = totalAmount.add(
+                    powerConsumption.multiply(price)
+                );
+                // Trả về kết quả
+                break;
+            }
+            System.out.println("total amout" + totalAmount);
+        }
+
+// Trả về kết quả
+        return new TotalAmountResponse(totalAmount);
+
 
     }
 

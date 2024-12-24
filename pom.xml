@@ -79,6 +79,10 @@
             <version>4.0.1</version> <!-- Hoặc phiên bản phù hợp với ứng dụng của bạn -->
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

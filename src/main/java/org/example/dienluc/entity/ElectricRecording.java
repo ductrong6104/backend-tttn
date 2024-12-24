@@ -1,6 +1,7 @@
 package org.example.dienluc.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -50,5 +51,9 @@ public class ElectricRecording {
             newIndex = (double) 0;
             oldIndex = (double) 0;
         }
+    }
+    @JsonIgnore
+    public Double getPowerConsumption(){
+        return newIndex - oldIndex;
     }
 }

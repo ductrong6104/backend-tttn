@@ -1,6 +1,7 @@
 package org.example.dienluc.util;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,9 @@ public class MapperUtil {
                 }
                 return instance;
             } catch (Exception e) {
+                System.err.println("Error mapping result: " + Arrays.toString(result) +
+                        " to class: " + clazz.getSimpleName());
+                e.printStackTrace(); // In toàn bộ stack trace
                 throw new RuntimeException("Failed to map result to " + clazz.getSimpleName(), e);
             }
         }).collect(Collectors.toList());

@@ -1,9 +1,8 @@
 package org.example.dienluc.service.serviceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.dienluc.entity.ElectricRecording;
-import org.example.dienluc.entity.Employee;
-import org.example.dienluc.entity.PowerMeter;
+import org.example.dienluc.entity.*;
+import org.example.dienluc.repository.ClientRepository;
 import org.example.dienluc.repository.ElectricRecordingRepository;
 import org.example.dienluc.repository.EmployeeRepository;
 import org.example.dienluc.repository.PowerMeterRepository;
@@ -30,13 +29,17 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
     private final ModelMapper modelMapper;
     private final EmployeeRepository employeeRepository;
     private final PowerMeterRepository powerMeterRepository;
+    private final ClientRepository clientRepository;
     @Autowired
+    private final EmailServiceImpl emailService;
     private JdbcTemplate jdbcTemplate;
-    public ElectricRecordingServiceImpl(ElectricRecordingRepository electricRecordingRepository, ModelMapper modelMapper, EmployeeRepository employeeRepository, PowerMeterRepository powerMeterRepository) {
+    public ElectricRecordingServiceImpl(ElectricRecordingRepository electricRecordingRepository, ModelMapper modelMapper, EmployeeRepository employeeRepository, PowerMeterRepository powerMeterRepository, ClientRepository clientRepository, EmailServiceImpl emailService) {
         this.electricRecordingRepository = electricRecordingRepository;
         this.modelMapper = modelMapper;
         this.employeeRepository = employeeRepository;
         this.powerMeterRepository = powerMeterRepository;
+        this.clientRepository = clientRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -196,6 +199,21 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
         List<Object[]> results = electricRecordingRepository.findByPowerMeterIdOrderByRecordingDate(powerMeterId);
         String[] fields = {"id", "powerMeterId", "recordingDate", "oldIndex", "newIndex"};
         return MapperUtil.mapResults(results, ElectricRecordingHistoryByPowerMeterDto.class, fields);
+    }
+
+    @Override
+    public String notifyReadingDay(Integer powerMeterId) {
+        PowerMeter powerMeter = powerMeterRepository.findById(powerMeterId)
+                .orElseThrow(() -> new EntityNotFoundException("PowerMeter not found with id: " + powerMeterId));
+        String subject = "Thông báo: Nhân viên ghi điện tới vào ngày mai";
+        String body = String.format(
+                "Kính gửi %s,\n\nChúng tôi xin thông báo rằng nhân viên sẽ tới ghi chỉ số điện của bạn vào ngày mai, %s, tại vị trí: %s.\n\nCảm ơn bạn!",
+                "n20dccn079@student.ptithcm.edu.vn",
+                DateUtil.formatDateForDatabase(LocalDate.now().plusDays(1)),
+                powerMeter.getInstallationLocation()
+        );
+        emailService.sendEmail("n20dccn079@student.ptithcm.edu.vn", subject, body);
+        return "notify reading day client success";
     }
 
 }

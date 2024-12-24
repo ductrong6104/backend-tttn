@@ -36,4 +36,6 @@ public interface ElectricRecordingService {
     public String createAutomationAssignmentOneEmployee(ElectricRecordingAutoAssign electricRecordingAutoAssign);
 
     public List<ElectricRecordingHistoryByPowerMeterDto> getRecordingHistoryByPowerMeter(Integer powerMeterId);
+
+    public String notifyReadingDay(Integer powerMeterId);
 }

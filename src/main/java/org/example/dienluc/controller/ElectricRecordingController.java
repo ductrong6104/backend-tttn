@@ -198,4 +198,13 @@ public class ElectricRecordingController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+    @GetMapping("/notify-reading-day/powerMeter/{powerMeterId}")
+    public ResponseEntity<?> notifyReadingDay(@PathVariable Integer powerMeterId) {
+        ResponseData responseData = ResponseData.builder()
+                .data(electricRecordingService.notifyReadingDay(powerMeterId))
+                .message("notify reading day")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(responseData);
+    }
 }

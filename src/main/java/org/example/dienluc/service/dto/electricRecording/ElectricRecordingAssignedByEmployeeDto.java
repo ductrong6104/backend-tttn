@@ -15,4 +15,5 @@ public class ElectricRecordingAssignedByEmployeeDto {
     private Double oldIndex;
     private Double longitude;
     private Double latitude;
+    private String electricTypeName;
 }

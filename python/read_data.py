@@ -7,6 +7,8 @@ from cluster_haversine import kmeans_haversine, visualize_cluster_distribution, 
 
 import sys
 import io
+
+from tsp_haversine import tsp_haversine
 # Đặt mã hóa UTF-8 cho output: Thêm dòng này vào đầu file Python để đặt mã hóa mặc định cho stdout và stderr thành UTF-8:
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 # Thông tin kết nối
@@ -64,6 +66,19 @@ number_employee = len(nhan_vien_coords)
 # # Phân cụm đồng hồ bằng khoảng cách Haversine
 labels, centroids, wcss_values, silhouette_scores = kmeans_haversine(dong_ho_coords, nhan_vien_coords, n_clusters=number_employee,
                                      max_iterations=10)
+
+# labels, centroids, wcss_values, optimal_routes, total_distances = tsp_haversine(
+#     dong_ho_coords, nhan_vien_coords, n_clusters=number_employee, max_iterations=100
+# )
+
+# print("optimal_routes", optimal_routes)
+# print("total_distances", total_distances)
+# # Hiển thị thông tin
+# for cluster_index, (route, total_distance) in enumerate(zip(optimal_routes, total_distances)):
+#     print(f"Cụm {cluster_index + 1}:")
+#     print("Tuyến đường tối ưu:", route)
+#     print(f"Tổng quãng đường: {total_distance:.2f} km\n")
+
 #     print(f"results of labels: {labels}")
 #     print(f"result of centroids: {centroids}")
 # Bước 2: Tính toán và hiển thị phân phối cụm

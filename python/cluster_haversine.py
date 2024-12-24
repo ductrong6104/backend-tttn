@@ -4,17 +4,20 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
 def geographic_centroid(coords):
+    # Hàm np.radians chuyển đổi từ độ (degrees) sang radian, vì các tính toán lượng giác trong NumPy yêu cầu giá trị góc ở radian.
     latitudes = np.radians([coord[0] for coord in coords])
     longitudes = np.radians([coord[1] for coord in coords])
-
+    # Tọa độ địa lý (lat, lon) được ánh xạ lên không gian 3D bằng công thức:
     x = np.mean(np.cos(latitudes) * np.cos(longitudes))
     y = np.mean(np.cos(latitudes) * np.sin(longitudes))
     z = np.mean(np.sin(latitudes))
-
+    # Kinh độ trung bình (longitude): Sử dụng hàm np.arctan2 để tính góc từ các giá trị trung bình y và x:
     longitude = np.arctan2(y, x)
+    # Độ cao trung bình (hyp): Tính khoảng cách từ gốc tọa độ (0,0,0) đến mặt phẳng xOyxOy:
     hyp = np.sqrt(x * x + y * y)
+    # Vĩ độ trung bình (latitude): Sử dụng hàm np.arctan2 với z và hyp để tính:
     latitude = np.arctan2(z, hyp)
-
+    # Kết quả cuối cùng được chuyển từ radian về độ bằng np.degrees:
     return np.degrees(latitude), np.degrees(longitude)
 
 def haversine(coord1, coord2):
