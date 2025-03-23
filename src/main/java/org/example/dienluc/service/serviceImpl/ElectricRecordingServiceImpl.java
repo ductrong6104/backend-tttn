@@ -32,6 +32,7 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
     private final ClientRepository clientRepository;
     @Autowired
     private final EmailServiceImpl emailService;
+    @Autowired
     private JdbcTemplate jdbcTemplate;
     public ElectricRecordingServiceImpl(ElectricRecordingRepository electricRecordingRepository, ModelMapper modelMapper, EmployeeRepository employeeRepository, PowerMeterRepository powerMeterRepository, ClientRepository clientRepository, EmailServiceImpl emailService) {
         this.electricRecordingRepository = electricRecordingRepository;
@@ -183,6 +184,8 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
         for (Integer powerMeterId : electricRecordingAutoAssign.getPowerMeterIds()) {
             // Thêm dữ liệu vào batchArgs dưới dạng mảng Object
             batchArgs.add(new Object[] { employeeId, powerMeterId});
+            System.out.println("employeeId" + employeeId);
+            System.out.println("powerMeterId " + powerMeterId);
         }
 
 
@@ -190,8 +193,28 @@ public class ElectricRecordingServiceImpl implements ElectricRecordingService {
         String sql = "INSERT INTO PHANCONG (IDNHANVIEN, IDDONGHODIEN) VALUES (?, ?)";
 
         // Thực hiện chèn hàng loạt
-        jdbcTemplate.batchUpdate(sql, batchArgs);
-        return "automation assign for one employee success";
+        try {
+            // Thực hiện chèn hàng loạt
+            jdbcTemplate.batchUpdate(sql, batchArgs);
+            return "Automation success";
+        } catch (Exception e) {
+            // Ghi log chi tiết lỗi
+            StringBuilder errorDetails = new StringBuilder("Error during batch insertion:\n");
+
+            for (Object[] args : batchArgs) {
+                errorDetails.append("Failed to insert: IDNHANVIEN = ")
+                        .append(args[0])
+                        .append(", IDDONGHODIEN = ")
+                        .append(args[1])
+                        .append("\n");
+            }
+
+            errorDetails.append("Exception: ").append(e.getMessage());
+            System.err.println(errorDetails); // Log lỗi ra console (có thể thay bằng logger)
+
+            // Ném ngoại lệ với thông tin chi tiết
+            throw new RuntimeException(errorDetails.toString(), e);
+        }
     }
 
     @Override
